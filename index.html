@@ -212,6 +212,244 @@
     margin-bottom: 2px;
     font-style: italic;
   }
+
+  /* ── Interactive Widgets ── */
+  .widget-box {
+    margin: 28px 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .widget-title {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .widget-prompt {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    font-style: italic;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+  .widget-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.8rem;
+  }
+  .widget-controls button {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .widget-controls button:hover {
+    background: #21262d;
+    color: var(--text);
+  }
+  .widget-controls .gen-counter {
+    color: var(--text-dim);
+    font-size: 0.78rem;
+    min-width: 100px;
+  }
+  .widget-controls select {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.75rem;
+    padding: 3px 6px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .widget-controls label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    cursor: pointer;
+  }
+  .widget-controls input[type="checkbox"] {
+    accent-color: var(--accent);
+  }
+  .widget-grid {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .widget-parent-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .widget-parent-card canvas {
+    background: var(--bg);
+    border-radius: 6px;
+    border: 2px solid var(--accent);
+  }
+  .widget-parent-card .parent-label {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.7rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .widget-offspring-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+  }
+  .widget-offspring-grid canvas {
+    background: var(--bg);
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: border-color 0.15s;
+    width: 100%;
+    aspect-ratio: 1;
+  }
+  .widget-offspring-grid canvas:hover {
+    border-color: var(--accent);
+  }
+
+  /* Gene Explorer */
+  .gene-explorer-body {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .gene-explorer-body canvas {
+    background: var(--bg);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .gene-explorer-sliders {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+  }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.75rem;
+  }
+  .slider-row .slider-label {
+    width: 24px;
+    text-align: right;
+    color: var(--accent);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .slider-row input[type="range"] {
+    flex: 1;
+    min-width: 0;
+    accent-color: var(--accent);
+    height: 4px;
+  }
+  .slider-row .slider-val {
+    width: 28px;
+    text-align: center;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .slider-row .slider-tip {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    display: none;
+  }
+
+  /* Graduation panel */
+  .widget-graduation {
+    margin: 28px 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid #3fb950;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+  }
+  .widget-graduation .grad-title {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #3fb950;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
+  .widget-graduation p {
+    text-align: center;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+  .widget-graduation .grad-links {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .widget-graduation .grad-links a {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.82rem;
+    padding: 8px 20px;
+    border: 1px solid #3fb950;
+    border-radius: 6px;
+    color: #3fb950;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  .widget-graduation .grad-links a:hover {
+    background: #3fb950;
+    color: var(--bg);
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .widget-grid {
+      flex-direction: column;
+      align-items: center;
+    }
+    .widget-offspring-grid {
+      grid-template-columns: repeat(2, 1fr);
+      width: 100%;
+    }
+    .gene-explorer-body {
+      flex-direction: column;
+      align-items: center;
+    }
+    .gene-explorer-sliders {
+      width: 100%;
+    }
+    .widget-graduation .grad-links {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
 </style>
 </head>
 <body>
@@ -323,6 +561,9 @@
   <figcaption><strong>FIGURE 4</strong>&ensp;Basic tree with high-order branching.</figcaption>
 </figure>
 
+<div id="widget-gene-explorer"></div>
+
+
 <p>Tree, then, was to be the basis of my embryology. Since the arrays <code>dx</code> and <code>dy</code>, and the parameter <code>length</code>, determine the shape of a tree, these were clearly the main items that should be controlled by genes. On the face of it this suggests that there should have been 16 genes, for 8 <code>dx</code> and 8 for <code>dy</code>. However I wanted, for biological reasons, to add one more constraint. Most animals are, as remarked above, bilaterally symmetrical. Such a requirement could be built into the biomorph embryology by constraining certain members of the <code>dx</code> and <code>dy</code> parameters to be equal to one another, sometimes with opposite sign. Instead of 16 genes, therefore, I ended up with 9. Genes 1 to 3 control clusters of the <code>dx</code> array. Genes 4 to 8 control clusters of the <code>dy</code> array. And Gene 9 encodes the starting value of depth, the "order" of the recursive tree or in other words the number of branchings. The details are as follows:</p>
 
 <pre>procedure Plug(in ThisGenotype: Genotype);
@@ -362,6 +603,9 @@
     </div>
   <figcaption><strong>FIGURE 5</strong>&ensp;Breeding screen.</figcaption>
 </figure>
+
+<div id="widget-first-breeding"></div>
+
 </section>
 <section>
 <span class="page-num">p. 208</span>
@@ -400,6 +644,9 @@
     </div>
   <figcaption><strong>FIGURE 7</strong>&ensp;Asymmetrical biomorphs (a), up-down symmetry (b), four-way radial symmetry (c), up-down symmetry as a reflection in a horizontal mirror (d), up-down symmetry by rotation (e), and left-right asymmetry with four-way radial symmetry (f).</figcaption>
 </figure>
+
+<div id="widget-symmetry"></div>
+
 </section>
 <section>
 <span class="page-num">p. 210</span>
@@ -424,6 +671,9 @@
     </div>
   <figcaption><strong>FIGURE 8</strong>&ensp;(a) shows a series of biomorphs which are identical except with respect to the value of the segment-number gene and (b) is a series which is identical except with respect to the value of the segment-distance gene.</figcaption>
 </figure>
+
+<div id="widget-segmentation"></div>
+
 </section>
 <section>
 <h2>Gradients</h2>
@@ -444,6 +694,9 @@
     </div>
   <figcaption><strong>FIGURE 9</strong>&ensp;Effect of gradient on two genes.</figcaption>
 </figure>
+
+<div id="widget-gradients"></div>
+
 
 <p>Figure 10 is a portfolio of segmented biomorphs, most of them with gradients. These are biomorphs that have been bred by selection, in the same way as those in Figure 6, but with the possibility of mutation in the two segment-controlling genes. You can think of the Figure 6 biomorphs as having had these two genes set to zero. If you compare Figure 10 with Figure 6, I think you'll agree that segmentation has added to the ecological interest of the specimens. An embryological innovation, in this case segmentation, has allowed the evolution of a whole new range of types. We may conjecture that much the same thing happened in the ancestry of the vertebrates and in the separate ancestry of the annelids and arthropods.</p>
 
@@ -513,6 +766,9 @@
   <figcaption><strong>FIGURE 14</strong>&ensp;Portfolio of "echinoderms."</figcaption>
 </figure>
 
+<div id="widget-full-dawkins"></div>
+
+
 <p>I present my "echinoderm" portfolio (Figure 14) as another illustration of all my "new" mutation types&mdash;all the various symmetry mutations, and the segmentation and gradient mutations. Any zoologist will instantly spot the trouble with these "echinoderms." They have four-way radial symmetry rather than five-way symmetry. The present program is not capable of producing five-way radial symmetry. Once again, we are brought back to our major theme. Huge vistas of evolutionary possibility, in real life as well as in artificial life, may be kept waiting a very long time, if not indefinitely, for a major, releasing change in embryology. Which brings me to the problems of the biomorph alphabet.</p>
 
 <p>If we can breed animals and plants, I thought, why not any arbitrarily designated shapes? You can't get much more arbitrary than the alphabet, so how about an alphabet of biomorphs? While breeding, wandering around in "Biomorph Land,"<sup>1</sup> I would sometimes encounter biomorphs that had a slight look of one of the letters of the alphabet. I then would try to perfect the resemblance by selective breeding, preserving intermediate results and returning to try again whenever I had an idle moment. In this way I gradually built up an album of alphabetic characters. My aim was eventually to sign my name legibly in biomorph script. Figure 15a shows that I have not quite achieved this yet, although I had more luck (Figure 15b) in using biomorph script to pay tribute to the uniquely brilliant microcomputer which made all this work so easy. The problems are not trivial. Some</p>
@@ -528,6 +784,9 @@
     </div>
   <figcaption><strong>FIGURE 15</strong>&ensp;Biomorphs that resemble letters of the alphabet.</figcaption>
 </figure>
+
+<div id="widget-alphabet"></div>
+
 </section>
 <section>
 <span class="page-num">p. 216</span>
@@ -562,6 +821,9 @@
 
 <p>The world is dominated by phyla, classes and orders whose embryology equipped them to diverge and inherit the earth. Although I am sure I have always been dimly aware of this, I think it is true to say that it is the biomorph program&mdash;writing it, playing with it, and above all modifying it as iterative on evolutionary potential&mdash;that has really drummed it into my innermost convictions. So what started out as an educational exercise&mdash;I was trying to develop a tool to teach other people&mdash;ended up as an educational exercise in another sense. I ended up teaching something to myself about real life. There could be less worthy uses of artificial life.</p>
 </section>
+
+<div id="widget-graduation"></div>
+
 <section class="footnotes">
 <h2>Acknowledgments</h2>
 <p>I thank Alan Grafen, Ted Kaehler and Helena Cronin for help and discussions of various kinds. Chris Langton for inviting me to Los Alamos to one of the most stimulating conferences I have been to, and Apple Computer Inc. whose generosity made it possible for me to go to Los Alamos.</p>
@@ -1369,6 +1631,367 @@ function renderFigure15(container) {
     paperRenderLines(canvas, lines, { padding: 4, lineWidth: 1 });
   }
 }
+
+
+// ── Interactive Widgets ──────────────────────────────────────────
+
+const GENE_TOOLTIPS = [
+  'g1: Horizontal spread of inner branches',
+  'g2: Horizontal spread of mid branches',
+  'g3: Horizontal spread of outer branches',
+  'g4: Vertical length of trunk',
+  'g5: Vertical extent of inner branches',
+  'g6: Vertical extent of mid branches',
+  'g7: Vertical extent of outer branches',
+  'g8: Horizontal scaling factor',
+  'g9: Recursion depth (branching order)',
+];
+
+function createGeneExplorer(config) {
+  const container = document.getElementById(config.id);
+  if (!container) return;
+
+  const mode = config.mode || 1;
+  const modeConfig = PAPER_MODE_CONFIGS[mode];
+  let genes = config.startGenes.slice();
+
+  // Build DOM
+  const box = document.createElement('div');
+  box.className = 'widget-box';
+
+  const title = document.createElement('div');
+  title.className = 'widget-title';
+  title.textContent = 'Gene Explorer';
+  box.appendChild(title);
+
+  const prompt = document.createElement('div');
+  prompt.className = 'widget-prompt';
+  prompt.textContent = config.prompt || '';
+  box.appendChild(prompt);
+
+  const body = document.createElement('div');
+  body.className = 'gene-explorer-body';
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 200;
+  canvas.height = 200;
+  body.appendChild(canvas);
+
+  const slidersDiv = document.createElement('div');
+  slidersDiv.className = 'gene-explorer-sliders';
+
+  const sliders = [];
+  for (let i = 0; i < modeConfig.geneCount; i++) {
+    const row = document.createElement('div');
+    row.className = 'slider-row';
+
+    const label = document.createElement('span');
+    label.className = 'slider-label';
+    label.textContent = 'g' + (i + 1);
+    row.appendChild(label);
+
+    const input = document.createElement('input');
+    input.type = 'range';
+    input.min = modeConfig.geneMin[i];
+    input.max = modeConfig.geneMax[i];
+    input.value = genes[i];
+    input.title = GENE_TOOLTIPS[i] || ('Gene ' + (i + 1));
+    row.appendChild(input);
+
+    const val = document.createElement('span');
+    val.className = 'slider-val';
+    val.textContent = genes[i];
+    row.appendChild(val);
+
+    input.addEventListener('input', () => {
+      genes[i] = parseInt(input.value);
+      val.textContent = genes[i];
+      render();
+    });
+
+    sliders.push({ input, val });
+    slidersDiv.appendChild(row);
+  }
+
+  body.appendChild(slidersDiv);
+  box.appendChild(body);
+
+  // Controls
+  const controls = document.createElement('div');
+  controls.className = 'widget-controls';
+  controls.style.marginTop = '12px';
+  const resetBtn = document.createElement('button');
+  resetBtn.textContent = 'Reset';
+  resetBtn.addEventListener('click', () => {
+    genes = config.startGenes.slice();
+    for (let i = 0; i < sliders.length; i++) {
+      sliders[i].input.value = genes[i];
+      sliders[i].val.textContent = genes[i];
+    }
+    render();
+  });
+  controls.appendChild(resetBtn);
+  box.appendChild(controls);
+
+  container.appendChild(box);
+
+  function render() {
+    const lines = paperDrawBiomorph(genes, { mode });
+    paperRenderLines(canvas, lines);
+  }
+  render();
+}
+
+function createBreedingWidget(config) {
+  const container = document.getElementById(config.id);
+  if (!container) return;
+
+  const mode = config.mode || 1;
+  const modeConfig = PAPER_MODE_CONFIGS[mode];
+  let parentGenes = config.startGenes.slice();
+  let generation = 0;
+  let symmetry = config.defaultSymmetry || 'left-right';
+  let altAsym = false;
+  let radial = false;
+
+  // Build DOM
+  const box = document.createElement('div');
+  box.className = 'widget-box';
+
+  const title = document.createElement('div');
+  title.className = 'widget-title';
+  title.textContent = config.title || 'Breeding Sandbox';
+  box.appendChild(title);
+
+  const prompt = document.createElement('div');
+  prompt.className = 'widget-prompt';
+  prompt.textContent = config.prompt || '';
+  box.appendChild(prompt);
+
+  // Controls bar
+  const controls = document.createElement('div');
+  controls.className = 'widget-controls';
+
+  const genCounter = document.createElement('span');
+  genCounter.className = 'gen-counter';
+  genCounter.textContent = 'Generation: 0';
+  controls.appendChild(genCounter);
+
+  const newBroodBtn = document.createElement('button');
+  newBroodBtn.textContent = 'New Brood';
+  newBroodBtn.addEventListener('click', () => renderWidget());
+  controls.appendChild(newBroodBtn);
+
+  const startOverBtn = document.createElement('button');
+  startOverBtn.textContent = 'Start Over';
+  startOverBtn.addEventListener('click', () => {
+    parentGenes = config.startGenes.slice();
+    generation = 0;
+    genCounter.textContent = 'Generation: 0';
+    renderWidget();
+  });
+  controls.appendChild(startOverBtn);
+
+  // Optional symmetry dropdown
+  let symSelect = null;
+  if (config.showSymmetry) {
+    const symLabel = document.createElement('span');
+    symLabel.textContent = 'Symmetry:';
+    symLabel.style.color = 'var(--text-dim)';
+    controls.appendChild(symLabel);
+    symSelect = document.createElement('select');
+    const symOptions = ['left-right', 'up-down', 'four-way', 'asymmetric'];
+    for (const opt of symOptions) {
+      const o = document.createElement('option');
+      o.value = opt;
+      o.textContent = opt;
+      if (opt === symmetry) o.selected = true;
+      symSelect.appendChild(o);
+    }
+    symSelect.addEventListener('change', () => {
+      symmetry = symSelect.value;
+      renderWidget();
+    });
+    controls.appendChild(symSelect);
+  }
+
+  // Optional alt-asym checkbox
+  let altAsymCheck = null;
+  if (config.showAltAsym) {
+    const lbl = document.createElement('label');
+    altAsymCheck = document.createElement('input');
+    altAsymCheck.type = 'checkbox';
+    altAsymCheck.checked = altAsym;
+    altAsymCheck.addEventListener('change', () => {
+      altAsym = altAsymCheck.checked;
+      renderWidget();
+    });
+    lbl.appendChild(altAsymCheck);
+    lbl.appendChild(document.createTextNode(' Alt. Asym'));
+    controls.appendChild(lbl);
+  }
+
+  // Optional radial checkbox
+  let radialCheck = null;
+  if (config.showRadial) {
+    const lbl = document.createElement('label');
+    radialCheck = document.createElement('input');
+    radialCheck.type = 'checkbox';
+    radialCheck.checked = radial;
+    radialCheck.addEventListener('change', () => {
+      radial = radialCheck.checked;
+      renderWidget();
+    });
+    lbl.appendChild(radialCheck);
+    lbl.appendChild(document.createTextNode(' Radial'));
+    controls.appendChild(lbl);
+  }
+
+  box.appendChild(controls);
+
+  // Grid: parent + offspring
+  const grid = document.createElement('div');
+  grid.className = 'widget-grid';
+
+  const parentCard = document.createElement('div');
+  parentCard.className = 'widget-parent-card';
+  const parentCanvas = document.createElement('canvas');
+  parentCanvas.width = 160;
+  parentCanvas.height = 160;
+  parentCard.appendChild(parentCanvas);
+  const parentLabel = document.createElement('div');
+  parentLabel.className = 'parent-label';
+  parentLabel.textContent = 'Parent';
+  parentCard.appendChild(parentLabel);
+  grid.appendChild(parentCard);
+
+  const offspringGrid = document.createElement('div');
+  offspringGrid.className = 'widget-offspring-grid';
+
+  const offspringCanvases = [];
+  const offspringGenes = [];
+  for (let i = 0; i < 8; i++) {
+    const c = document.createElement('canvas');
+    c.width = 100;
+    c.height = 100;
+    offspringCanvases.push(c);
+    offspringGenes.push(null);
+    offspringGrid.appendChild(c);
+  }
+  grid.appendChild(offspringGrid);
+  box.appendChild(grid);
+  container.appendChild(box);
+
+  function getCfg() {
+    return { mode, symmetry, altAsym, radial };
+  }
+
+  function renderWidget() {
+    // Render parent
+    const pLines = paperDrawBiomorph(parentGenes, getCfg());
+    paperRenderLines(parentCanvas, pLines);
+
+    // Generate + render offspring
+    for (let i = 0; i < 8; i++) {
+      const child = paperMutate(parentGenes, mode);
+      offspringGenes[i] = child;
+      const cLines = paperDrawBiomorph(child, getCfg());
+      paperRenderLines(offspringCanvases[i], cLines);
+    }
+
+    // Attach click handlers (re-attach each render to keep closure fresh)
+    for (let i = 0; i < 8; i++) {
+      offspringCanvases[i].onclick = () => {
+        parentGenes = offspringGenes[i].slice();
+        generation++;
+        genCounter.textContent = 'Generation: ' + generation;
+        renderWidget();
+      };
+    }
+  }
+
+  renderWidget();
+}
+
+// ── Instantiate all widgets ──
+
+createGeneExplorer({
+  id: 'widget-gene-explorer',
+  mode: 1,
+  startGenes: [1, -1, 0, -1, 1, -2, 0, 1, 4],
+  prompt: 'Drag each slider to see how the 9 genes shape the biomorph.',
+});
+
+createBreedingWidget({
+  id: 'widget-first-breeding',
+  mode: 1,
+  startGenes: [2, -1, 1, -2, 1, -1, 0, 2, 5],
+  title: 'Breeding Sandbox',
+  prompt: 'Click any offspring to select it as the new parent. Can you breed something that looks like an insect?',
+});
+
+createBreedingWidget({
+  id: 'widget-symmetry',
+  mode: 2,
+  startGenes: [2, -1, 1, -2, 1, -1, 0, 2, 5],
+  title: 'Breeding Sandbox — Symmetry',
+  prompt: 'Try switching symmetries mid-breeding. Notice how new forms become reachable.',
+  showSymmetry: true,
+});
+
+createBreedingWidget({
+  id: 'widget-segmentation',
+  mode: 3,
+  startGenes: [1, -1, 0, -2, 1, -1, 0, 1, 4, 3, 5],
+  title: 'Breeding Sandbox — Segmentation',
+  prompt: 'Your creatures can now have body segments. Try breeding a millipede.',
+  showSymmetry: true,
+});
+
+createBreedingWidget({
+  id: 'widget-gradients',
+  mode: 4,
+  startGenes: [1, -1, 1, -2, 1, -1, 1, 1, 4, 4, 5, 0, 0],
+  title: 'Breeding Sandbox — Gradients',
+  prompt: 'Gradients make each segment slightly different. Watch how forms taper and flow.',
+  showSymmetry: true,
+  showAltAsym: true,
+});
+
+createBreedingWidget({
+  id: 'widget-full-dawkins',
+  mode: 5,
+  startGenes: [2, -1, 1, -2, 2, 1, -1, -2, 5, 5, 4, 1, -1],
+  title: 'Breeding Sandbox — Full Embryology',
+  prompt: 'You now have the complete embryology. What can you evolve?',
+  showSymmetry: true,
+  showAltAsym: true,
+  showRadial: true,
+});
+
+createBreedingWidget({
+  id: 'widget-alphabet',
+  mode: 1,
+  startGenes: [1, -1, 0, -1, 1, -2, 0, 1, 4],
+  title: 'Alphabet Challenge',
+  prompt: "Dawkins couldn\u2019t breed a proper K. Can you?",
+});
+
+// ── Graduation Panel ──
+(function() {
+  const el = document.getElementById('widget-graduation');
+  if (!el) return;
+  el.innerHTML = '<div class="widget-graduation">' +
+    '<div class="grad-title">You\u2019ve Graduated!</div>' +
+    '<p>You\u2019ve experienced Dawkins\u2019 full journey — from simple trees to radial echinoderms. ' +
+    'Ready to go deeper?</p>' +
+    '<div class="grad-links">' +
+    '<a href="https://biomorphbuilder.com" target="_blank">Full Biomorph Builder App</a>' +
+    '<a href="https://biomorphbuilder.com#gallery" target="_blank">3D Gallery</a>' +
+    '</div>' +
+    '</div>';
+})();
+
 
 // ── Dispatcher ──
 
