@@ -512,6 +512,18 @@
   .pi-inner::-webkit-scrollbar { display: none; }
   /* Expanded mode: entries positioned at paragraph offsets */
   .pi-inner.pi-expanded { overflow: hidden; }
+  /* Debug: region bounds */
+  .pi-guide {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 0;
+    border-top: 1px dashed rgba(255, 100, 100, 0.35);
+    pointer-events: none;
+    display: none;
+  }
+  .pi-guide.pi-guide-bot { border-top-color: rgba(100, 200, 255, 0.35); }
+  .pi-debug .pi-guide { display: block; }
   .pi-inner.pi-expanded .pi-entry {
     position: absolute;
     left: 0;
@@ -2889,6 +2901,26 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   var ENTRY_H = 20; // approx height of one entry line
   var TOP_PAD = 32; // breathing room below header bar
 
+  // Debug guide lines (top = red dashed, bottom = blue dashed)
+  var guides = [];
+  entries.forEach(function() {
+    var gt = document.createElement('div');
+    gt.className = 'pi-guide pi-guide-top';
+    var gb = document.createElement('div');
+    gb.className = 'pi-guide pi-guide-bot';
+    inner.appendChild(gt);
+    inner.appendChild(gb);
+    guides.push({ top: gt, bot: gb });
+  });
+
+  // Alt+click toggle button to show/hide debug guides
+  toggleBtn.addEventListener('click', function(e) {
+    if (e.altKey) {
+      e.stopImmediatePropagation();
+      inner.classList.toggle('pi-debug');
+    }
+  }, true);
+
   function positionEntries() {
     if (!expanded) return;
     var n = entries.length;
@@ -2909,6 +2941,9 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       entries[i].style.top = pos + 'px';
       // Fade when entry has slid above header
       entries[i].style.opacity = pos < TOP_PAD - 4 ? '0' : pos < TOP_PAD + 2 ? '0.4' : '1';
+      // Update debug guides
+      guides[i].top.style.top = paraTop + 'px';
+      guides[i].bot.style.top = regionBottom + 'px';
     }
   }
 
