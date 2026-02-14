@@ -926,6 +926,129 @@
     margin-top: 6px;
   }
 
+  /* ── Study mode ── */
+  .fc-dot.fc-due {
+    animation: fc-glow 2s ease-in-out infinite;
+  }
+  @keyframes fc-glow {
+    0%, 100% { box-shadow: 0 0 4px var(--accent); }
+    50% { box-shadow: 0 0 12px var(--accent); transform: scale(1.3); }
+  }
+  .fc-dot.fc-dot-qa.fc-due {
+    animation-name: fc-glow-qa;
+  }
+  @keyframes fc-glow-qa {
+    0%, 100% { box-shadow: 0 0 4px #f0883e; }
+    50% { box-shadow: 0 0 12px #f0883e; transform: scale(1.3); }
+  }
+  .fc-study-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 310;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    font-family: system-ui, sans-serif;
+    font-size: 0.85rem;
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .fc-study-banner-text { font-weight: 600; }
+  .fc-study-banner button {
+    padding: 4px 14px;
+    font-size: 0.8rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .fc-study-banner button:hover { border-color: var(--accent); color: var(--accent); }
+  .fc-study-popover {
+    position: absolute;
+    z-index: 200;
+    width: 320px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    font-family: system-ui, sans-serif;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text);
+    display: none;
+  }
+  .fc-study-popover.fc-visible { display: block; }
+  .fc-study-popover .fc-study-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .fc-study-popover .fc-study-front { margin-bottom: 8px; }
+  .fc-study-popover .fc-study-back {
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+  }
+  .fc-reveal-btn {
+    display: block;
+    width: 100%;
+    padding: 8px 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    background: var(--accent);
+    color: var(--bg);
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  .fc-reveal-btn:hover { opacity: 0.85; }
+  .fc-rate-btns {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .fc-rate-btns button {
+    flex: 1;
+    padding: 7px 0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: #fff;
+  }
+  .fc-rate-btns button:hover { opacity: 0.85; }
+  .fc-rate-again { background: #f85149; }
+  .fc-rate-good { background: var(--accent); }
+  .fc-rate-easy { background: #3fb950; }
+  .fc-study-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 0;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--bg);
+    cursor: pointer;
+  }
+  .fc-study-btn:hover { opacity: 0.85; }
+  .fc-study-btn:disabled { opacity: 0.4; cursor: default; }
+
   @media (max-width: 600px) {
     .fc-drawer { width: 100vw; }
     .fc-editor { width: calc(100vw - 32px); }
@@ -2996,11 +3119,16 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
         back: backs.join(', '),
         created: Date.now()
       };
+      if (studyMode) {
+        card.interval = 0; card.ease = 2.5; card.reps = 0;
+        card.nextReview = Date.now(); card.lastReview = 0;
+      }
       cards.push(card);
       save();
       hideEditor();
       flashFab();
       renderDots();
+      if (studyMode) { dueQueue.push(card); updateStudyBanner(); }
       window.getSelection().removeAllRanges();
 
     } else {
@@ -3019,11 +3147,16 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
         back: a || selText,
         created: Date.now()
       };
+      if (studyMode) {
+        card.interval = 0; card.ease = 2.5; card.reps = 0;
+        card.nextReview = Date.now(); card.lastReview = 0;
+      }
       cards.push(card);
       save();
       hideEditor();
       flashFab();
       renderDots();
+      if (studyMode) { dueQueue.push(card); updateStudyBanner(); }
       window.getSelection().removeAllRanges();
     }
   });
@@ -3071,6 +3204,23 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       return;
     }
     cardContainer.innerHTML = '';
+    // Study button
+    var dueCount = cards.filter(isDue).length;
+    var studyBtn = document.createElement('button');
+    studyBtn.className = 'fc-study-btn';
+    studyBtn.textContent = studyMode
+      ? 'Study (' + dueCount + ' remaining)'
+      : 'Study' + (dueCount > 0 ? ' (' + dueCount + ' due)' : '');
+    studyBtn.disabled = dueCount === 0 && !studyMode;
+    studyBtn.addEventListener('click', function() {
+      closeDrawer();
+      if (studyMode) {
+        scrollToNextDue();
+      } else {
+        enterStudy();
+      }
+    });
+    cardContainer.appendChild(studyBtn);
     // Show newest first
     for (let i = cards.length - 1; i >= 0; i--) {
       const c = cards[i];
@@ -3405,9 +3555,14 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
         dot.className = 'fc-dot fc-dot-' + card.type;
         dot.title = card.type === 'cloze' ? 'Cloze card' : 'Q&A card';
         dot.dataset.cardId = card.id;
+        if (studyMode && isDue(card)) dot.classList.add('fc-due');
         dot.addEventListener('click', function(e) {
           e.stopPropagation();
-          showPopover(dot, card);
+          if (studyMode && isDue(card)) {
+            showStudyPopover(dot, card);
+          } else if (!studyMode) {
+            showPopover(dot, card);
+          }
         });
         wrap.appendChild(dot);
       });
@@ -3418,6 +3573,10 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
 
   // Dismiss popover on click outside
   document.addEventListener('mousedown', function(e) {
+    if (studyPopoverVisible && e.target.closest && !e.target.closest('.fc-study-popover') && !e.target.closest('.fc-dot')) {
+      hideStudyPopover();
+      return;
+    }
     if (activePopoverCard && e.target.closest && !e.target.closest('.fc-popover') && !e.target.closest('.fc-dot')) {
       hidePopover();
     }
@@ -3426,12 +3585,257 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   // ── Keyboard: Escape closes drawer/editor ──
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
+      if (studyPopoverVisible) { hideStudyPopover(); return; }
+      if (studyMode) { exitStudy(); return; }
       if (activePopoverCard) { hidePopover(); return; }
       if (drawerOpen) closeDrawer();
       hideEditor();
       hidePopup();
     }
   });
+
+  // ── Study Mode ──
+  var studyMode = false;
+  var dueQueue = [];
+  var dueIndex = 0;
+  var reviewedCount = 0;
+  var studyPopoverVisible = false;
+  var studyPopoverCardObj = null;
+
+  function isDue(card) {
+    return !card.nextReview || card.nextReview <= Date.now();
+  }
+
+  // Study banner
+  var studyBanner = document.createElement('div');
+  studyBanner.className = 'fc-study-banner';
+  studyBanner.style.display = 'none';
+  studyBanner.innerHTML =
+    '<span class="fc-study-banner-text"></span>' +
+    '<button class="fc-study-exit">Exit Study</button>';
+  document.body.appendChild(studyBanner);
+  studyBanner.querySelector('.fc-study-exit').addEventListener('click', exitStudy);
+
+  // Study popover
+  var studyPop = document.createElement('div');
+  studyPop.className = 'fc-study-popover';
+  studyPop.innerHTML =
+    '<div class="fc-study-label"></div>' +
+    '<div class="fc-study-front"></div>' +
+    '<div class="fc-study-back" style="display:none"></div>' +
+    '<button class="fc-reveal-btn">Reveal</button>' +
+    '<div class="fc-rate-btns" style="display:none">' +
+      '<button class="fc-rate-again">Again</button>' +
+      '<button class="fc-rate-good">Good</button>' +
+      '<button class="fc-rate-easy">Easy</button>' +
+    '</div>';
+  document.body.appendChild(studyPop);
+
+  studyPop.querySelector('.fc-reveal-btn').addEventListener('click', function() {
+    if (studyPopoverCardObj) revealStudyCard(studyPopoverCardObj);
+  });
+  studyPop.querySelector('.fc-rate-again').addEventListener('click', function() {
+    if (studyPopoverCardObj) rateCard(studyPopoverCardObj, 'again');
+  });
+  studyPop.querySelector('.fc-rate-good').addEventListener('click', function() {
+    if (studyPopoverCardObj) rateCard(studyPopoverCardObj, 'good');
+  });
+  studyPop.querySelector('.fc-rate-easy').addEventListener('click', function() {
+    if (studyPopoverCardObj) rateCard(studyPopoverCardObj, 'easy');
+  });
+
+  function enterStudy() {
+    studyMode = true;
+    reviewedCount = 0;
+    hidePopover();
+
+    // Initialize SRS fields on cards that don't have them
+    cards.forEach(function(c) {
+      if (c.interval === undefined) c.interval = 0;
+      if (c.ease === undefined) c.ease = 2.5;
+      if (c.reps === undefined) c.reps = 0;
+      if (c.nextReview === undefined || c.nextReview === 0) c.nextReview = 0;
+      if (c.lastReview === undefined) c.lastReview = 0;
+    });
+    save();
+
+    // Build due queue in document order
+    buildDueQueue();
+
+    if (dueQueue.length === 0) {
+      studyMode = false;
+      return;
+    }
+
+    // Add glow to due dots
+    refreshDueGlow();
+
+    // Show banner
+    updateStudyBanner();
+    studyBanner.style.display = '';
+
+    // Scroll to first due
+    dueIndex = 0;
+    scrollToNextDue();
+  }
+
+  function buildDueQueue() {
+    // Get all paragraph elements in document order
+    var allParas = Array.from(document.querySelectorAll('[id^="p"]'));
+    var paraOrder = {};
+    allParas.forEach(function(p, i) { paraOrder[p.id] = i; });
+
+    dueQueue = cards.filter(isDue).sort(function(a, b) {
+      var oa = paraOrder[a.paragraphId] !== undefined ? paraOrder[a.paragraphId] : 99999;
+      var ob = paraOrder[b.paragraphId] !== undefined ? paraOrder[b.paragraphId] : 99999;
+      return oa - ob;
+    });
+  }
+
+  function refreshDueGlow() {
+    document.querySelectorAll('.fc-dot.fc-due').forEach(function(d) {
+      d.classList.remove('fc-due');
+    });
+    if (!studyMode) return;
+    dueQueue.forEach(function(card) {
+      if (isDue(card)) {
+        var dot = document.querySelector('.fc-dot[data-card-id="' + card.id + '"]');
+        if (dot) dot.classList.add('fc-due');
+      }
+    });
+  }
+
+  function updateStudyBanner() {
+    var remaining = dueQueue.filter(isDue).length;
+    studyBanner.querySelector('.fc-study-banner-text').textContent =
+      'Study mode: ' + remaining + ' card' + (remaining !== 1 ? 's' : '') + ' due';
+  }
+
+  function exitStudy() {
+    studyMode = false;
+    studyBanner.style.display = 'none';
+    hideStudyPopover();
+    document.querySelectorAll('.fc-dot.fc-due').forEach(function(d) {
+      d.classList.remove('fc-due');
+    });
+    dueQueue = [];
+  }
+
+  function showStudyPopover(dot, card) {
+    clearHighlights();
+    hidePopover();
+    studyPopoverCardObj = card;
+    studyPopoverVisible = true;
+
+    // Highlight source text
+    highlightSource(card);
+
+    // Mark dot active
+    document.querySelectorAll('.fc-dot-active').forEach(function(d) {
+      d.classList.remove('fc-dot-active');
+    });
+    dot.classList.add('fc-dot-active');
+
+    // Fill content — front only
+    studyPop.querySelector('.fc-study-label').textContent =
+      (card.type === 'cloze' ? 'Cloze' : 'Q & A');
+    studyPop.querySelector('.fc-study-front').textContent = card.front;
+    studyPop.querySelector('.fc-study-back').style.display = 'none';
+    studyPop.querySelector('.fc-study-back').textContent = card.back;
+    studyPop.querySelector('.fc-reveal-btn').style.display = '';
+    studyPop.querySelector('.fc-rate-btns').style.display = 'none';
+
+    // Position
+    var dotRect = dot.getBoundingClientRect();
+    var left = dotRect.right + 8 + window.scrollX;
+    var top = dotRect.top - 8 + window.scrollY;
+    if (left + 330 > window.innerWidth) {
+      left = dotRect.left - 330 + window.scrollX;
+    }
+    top = Math.max(8 + window.scrollY, top);
+    studyPop.style.left = left + 'px';
+    studyPop.style.top = top + 'px';
+    studyPop.classList.add('fc-visible');
+  }
+
+  function hideStudyPopover() {
+    studyPop.classList.remove('fc-visible');
+    clearHighlights();
+    document.querySelectorAll('.fc-dot-active').forEach(function(d) {
+      d.classList.remove('fc-dot-active');
+    });
+    studyPopoverCardObj = null;
+    studyPopoverVisible = false;
+  }
+
+  function revealStudyCard(card) {
+    studyPop.querySelector('.fc-study-back').style.display = '';
+    studyPop.querySelector('.fc-reveal-btn').style.display = 'none';
+    studyPop.querySelector('.fc-rate-btns').style.display = '';
+  }
+
+  function rateCard(card, quality) {
+    var now = Date.now();
+    var DAY = 86400000;
+
+    if (quality === 'again') {
+      card.interval = 0;
+      card.ease = Math.max(1.3, card.ease - 0.2);
+      card.reps = 0;
+      card.nextReview = now; // due again this session
+    } else if (quality === 'good') {
+      if (card.reps === 0) card.interval = 1;
+      else if (card.reps === 1) card.interval = 3;
+      else card.interval = Math.round(card.interval * card.ease);
+      card.reps++;
+      card.nextReview = now + card.interval * DAY;
+    } else if (quality === 'easy') {
+      if (card.reps === 0) card.interval = 4;
+      else card.interval = Math.round(card.interval * card.ease * 1.3);
+      card.ease += 0.15;
+      card.reps++;
+      card.nextReview = now + card.interval * DAY;
+    }
+    card.lastReview = now;
+
+    // Update in cards array
+    for (var i = 0; i < cards.length; i++) {
+      if (cards[i].id === card.id) {
+        cards[i] = card;
+        break;
+      }
+    }
+    save();
+
+    // Remove glow from this dot
+    var dot = document.querySelector('.fc-dot[data-card-id="' + card.id + '"]');
+    if (dot && !isDue(card)) dot.classList.remove('fc-due');
+
+    hideStudyPopover();
+    reviewedCount++;
+    updateStudyBanner();
+
+    // Advance to next or show completion
+    scrollToNextDue();
+  }
+
+  function scrollToNextDue() {
+    // Find next still-due card
+    var remaining = dueQueue.filter(isDue);
+    if (remaining.length === 0) {
+      // All done
+      studyBanner.querySelector('.fc-study-banner-text').textContent =
+        'All done! ' + reviewedCount + ' card' + (reviewedCount !== 1 ? 's' : '') + ' reviewed';
+      setTimeout(exitStudy, 3000);
+      return;
+    }
+
+    var next = remaining[0];
+    var dot = document.querySelector('.fc-dot[data-card-id="' + next.id + '"]');
+    if (dot) {
+      dot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
 
   // ── Init ──
   load();
