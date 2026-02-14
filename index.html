@@ -470,6 +470,22 @@
     pointer-events: none;
     z-index: 100;
   }
+  .pi-toggle {
+    position: absolute;
+    right: 12px;
+    z-index: 101;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--text-dim);
+    font-size: 0.6rem;
+    font-family: system-ui, sans-serif;
+    padding: 2px 6px;
+    cursor: pointer;
+    pointer-events: auto;
+    letter-spacing: 0.03em;
+  }
+  .pi-toggle:hover { color: var(--text); border-color: var(--accent); background: var(--bg); }
   .pi-inner {
     position: absolute;
     right: 0;
@@ -478,11 +494,20 @@
     width: 100%;
     overflow-y: auto;
     pointer-events: auto;
-    padding: 48px 12px 80px 0;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
   .pi-inner::-webkit-scrollbar { display: none; }
+  /* Expanded mode: entries positioned at paragraph offsets */
+  .pi-inner.pi-expanded { overflow: visible; }
+  .pi-inner.pi-expanded .pi-entry {
+    position: absolute;
+    left: 0;
+    right: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .pi-entry {
     display: block;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -824,21 +849,15 @@
   .fc-card-del:hover { color: #f85149; }
 
   /* ── Margin dots ── */
-  .fc-dot-wrap {
-    position: absolute;
-    right: -28px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    z-index: 50;
-  }
   .fc-dot {
+    position: absolute;
+    right: -22px;
     width: 8px;
     height: 8px;
     border-radius: 50%;
     cursor: pointer;
     transition: transform 0.15s, box-shadow 0.15s;
-    flex-shrink: 0;
+    z-index: 50;
   }
   .fc-dot:hover { transform: scale(1.5); }
   .fc-dot-cloze { background: var(--accent); }
@@ -1087,6 +1106,7 @@
 </head>
 <body>
 <nav id="para-index" aria-label="Paragraph index">
+  <button class="pi-toggle" title="Toggle index layout">expand</button>
   <div class="pi-inner"></div>
 </nav>
 <article>
@@ -2740,7 +2760,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   const PARA_INDEX = [
     { id: 'p1', label: 'Artificial life' },
     { id: 'p2', label: 'needs replicators' },
-    { id: 'p3', label: "and Weismann’s principle:" },
+    { id: 'p3', label: "and Weismann's principle:" },
     { id: 'p4', label: 'genes build phenotypes' },
     { id: 'p5', label: 'but genetics ≠ embryology.' },
     { id: 'p6', label: 'Reproduce and Develop —' },
@@ -2789,8 +2809,10 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   ];
 
   const inner = document.querySelector('.pi-inner');
+  const toggleBtn = document.querySelector('.pi-toggle');
   if (!inner) return;
 
+  let expanded = localStorage.getItem('pi_mode') === 'expanded';
   const entries = [];
   const targets = [];
 
@@ -2799,6 +2821,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     a.className = 'pi-entry' + (item.heading ? ' pi-heading' : '');
     a.textContent = item.label;
     a.href = '#' + item.id;
+    a.dataset.target = item.id;
     a.addEventListener('click', e => {
       e.preventDefault();
       const el = document.getElementById(item.id);
@@ -2811,6 +2834,53 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     entries.push(a);
     targets.push(item.id);
   });
+
+  // Align top of index with p1
+  function alignTop() {
+    var p1 = document.getElementById('p1');
+    if (!p1) return;
+    var p1Top = p1.getBoundingClientRect().top + window.scrollY;
+    inner.style.paddingTop = p1Top + 'px';
+    toggleBtn.style.top = (p1Top - 20) + 'px';
+  }
+  alignTop();
+
+  // Toggle expanded/condensed
+  function applyMode() {
+    if (expanded) {
+      inner.classList.add('pi-expanded');
+      toggleBtn.textContent = 'condense';
+      toggleBtn.style.top = '';
+      toggleBtn.style.bottom = '12px';
+      positionEntries();
+    } else {
+      inner.classList.remove('pi-expanded');
+      toggleBtn.textContent = 'expand';
+      entries.forEach(function(a) { a.style.top = ''; });
+      toggleBtn.style.bottom = '';
+      alignTop();
+    }
+  }
+
+  toggleBtn.addEventListener('click', function() {
+    expanded = !expanded;
+    localStorage.setItem('pi_mode', expanded ? 'expanded' : 'condensed');
+    applyMode();
+  });
+
+  // Position entries next to their paragraphs (expanded mode)
+  // Uses viewport-relative coords since sidebar is position:fixed
+  function positionEntries() {
+    if (!expanded) return;
+    entries.forEach(function(a) {
+      var id = a.dataset.target;
+      var el = document.getElementById(id);
+      if (!el) return;
+      a.style.top = el.getBoundingClientRect().top + 'px';
+    });
+  }
+
+  applyMode();
 
   // Scroll tracking
   let ticking = false;
@@ -2826,14 +2896,12 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       if (!el) continue;
       const top = el.getBoundingClientRect().top;
       const dist = Math.abs(top - threshold);
-      // Prefer elements that are at or above the threshold line
       if (top <= threshold + 10) {
         if (top > -window.innerHeight) {
           bestIdx = i;
           bestDist = dist;
         }
       } else if (bestDist === Infinity) {
-        // Nothing above threshold yet, take closest below
         if (dist < bestDist) {
           bestIdx = i;
           bestDist = dist;
@@ -2841,23 +2909,28 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       }
     }
 
+    // Update expanded entry positions every frame
+    positionEntries();
+
     if (bestIdx !== activeIdx) {
       if (activeIdx >= 0) entries[activeIdx].classList.remove('active');
       entries[bestIdx].classList.add('active');
       activeIdx = bestIdx;
 
-      // Auto-scroll sidebar to keep active entry visible
-      const entry = entries[bestIdx];
-      const container = inner;
-      const entryTop = entry.offsetTop;
-      const entryH = entry.offsetHeight;
-      const scrollTop = container.scrollTop;
-      const containerH = container.clientHeight;
+      // Auto-scroll sidebar to keep active entry visible (condensed only)
+      if (!expanded) {
+        const entry = entries[bestIdx];
+        const container = inner;
+        const entryTop = entry.offsetTop;
+        const entryH = entry.offsetHeight;
+        const scrollTop = container.scrollTop;
+        const containerH = container.clientHeight;
 
-      if (entryTop < scrollTop + 60) {
-        container.scrollTo({ top: Math.max(0, entryTop - 60), behavior: 'smooth' });
-      } else if (entryTop + entryH > scrollTop + containerH - 60) {
-        container.scrollTo({ top: entryTop + entryH - containerH + 60, behavior: 'smooth' });
+        if (entryTop < scrollTop + 60) {
+          container.scrollTo({ top: Math.max(0, entryTop - 60), behavior: 'smooth' });
+        } else if (entryTop + entryH > scrollTop + containerH - 60) {
+          container.scrollTo({ top: entryTop + entryH - containerH + 60, behavior: 'smooth' });
+        }
       }
     }
     ticking = false;
@@ -2870,7 +2943,6 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     }
   }, { passive: true });
 
-  // Initial update
   requestAnimationFrame(updateActive);
 })();
 
@@ -3661,9 +3733,33 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     highlightSource(card);
   }
 
+  function getSourceYOffset(para, card) {
+    var src = card.source || card.anchor;
+    if (!src) return 4;
+    var fullText = para.textContent;
+    var startOffset = fullText.indexOf(src);
+    if (startOffset === -1) return 4;
+    var walker = document.createTreeWalker(para, NodeFilter.SHOW_TEXT);
+    var node, charCount = 0;
+    while (node = walker.nextNode()) {
+      var len = node.textContent.length;
+      if (charCount + len > startOffset) {
+        var localOffset = startOffset - charCount;
+        var range = document.createRange();
+        range.setStart(node, localOffset);
+        range.setEnd(node, Math.min(localOffset + 1, len));
+        var rect = range.getBoundingClientRect();
+        var paraRect = para.getBoundingClientRect();
+        return rect.top - paraRect.top;
+      }
+      charCount += len;
+    }
+    return 4;
+  }
+
   function renderDots() {
-    // Remove existing dot wraps
-    document.querySelectorAll('.fc-dot-wrap').forEach(function(w) { w.remove(); });
+    // Remove existing dots
+    document.querySelectorAll('.fc-dot').forEach(function(d) { d.remove(); });
     hidePopover();
 
     // Group cards by paragraph
@@ -3678,22 +3774,32 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       var para = document.getElementById(pid);
       if (!para) return;
 
-      // Ensure paragraph is positioned for absolute children
       if (getComputedStyle(para).position === 'static') {
         para.style.position = 'relative';
       }
 
-      var wrap = document.createElement('span');
-      wrap.className = 'fc-dot-wrap';
-      // Vertically center the dot cluster
-      wrap.style.top = '4px';
+      // Calculate y-offset for each card's source text
+      var positions = byPara[pid].map(function(card) {
+        return { card: card, y: getSourceYOffset(para, card) };
+      });
+      positions.sort(function(a, b) { return a.y - b.y; });
 
-      byPara[pid].forEach(function(card) {
+      // Place dots, stacking horizontally when on the same line
+      var placed = [];
+      positions.forEach(function(pos) {
+        var stackCount = 0;
+        placed.forEach(function(p) {
+          if (Math.abs(p.y - pos.y) < 10) stackCount++;
+        });
+
         var dot = document.createElement('span');
-        dot.className = 'fc-dot fc-dot-' + card.type;
-        dot.title = card.type === 'cloze' ? 'Cloze card' : card.type === 'qa' ? 'Q&A card' : 'Note';
-        dot.dataset.cardId = card.id;
-        if (studyMode && isDue(card)) dot.classList.add('fc-due');
+        dot.className = 'fc-dot fc-dot-' + pos.card.type;
+        dot.title = pos.card.type === 'cloze' ? 'Cloze card' : pos.card.type === 'qa' ? 'Q&A card' : 'Note';
+        dot.dataset.cardId = pos.card.id;
+        dot.style.top = pos.y + 'px';
+        if (stackCount > 0) dot.style.right = (-22 - stackCount * 12) + 'px';
+        if (studyMode && isDue(pos.card)) dot.classList.add('fc-due');
+        var card = pos.card;
         dot.addEventListener('click', function(e) {
           e.stopPropagation();
           if (studyMode && isDue(card)) {
@@ -3702,10 +3808,9 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
             showPopover(dot, card);
           }
         });
-        wrap.appendChild(dot);
+        para.appendChild(dot);
+        placed.push(pos);
       });
-
-      para.appendChild(wrap);
     });
   }
 
