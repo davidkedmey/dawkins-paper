@@ -564,6 +564,20 @@
   .pi-entry:hover {
     color: var(--text);
   }
+  .pi-num {
+    display: inline-block;
+    width: 14px;
+    text-align: right;
+    margin-right: 3px;
+    font-size: 0.55rem;
+    opacity: 0.35;
+    flex-shrink: 0;
+  }
+  .pi-page {
+    opacity: 0.35;
+    font-size: 0.5rem;
+    margin-left: 4px;
+  }
   .pi-entry.pi-heading {
     font-size: 0.65rem;
     font-weight: 700;
@@ -2796,7 +2810,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
 // === Paragraph Index ===
 (function() {
   const PARA_INDEX = [
-    { id: 'sec-basic', label: 'THE BASIC PROGRAM', heading: true },
+    { id: 'sec-basic', label: 'THE BASIC PROGRAM', heading: true, page: 201 },
     { id: 'p1', label: 'Artificial life' },
     { id: 'p2', label: 'needs replicators' },
     { id: 'p3', label: "and Weismann's principle:" },
@@ -2818,14 +2832,14 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     { id: 'p19', label: 'watch evolution unfold —' },
     { id: 'p20', label: 'astonishing morphologies!' },
     { id: 'p21', label: 'Cumulative selection works.' },
-    { id: 'sec-symmetry', label: 'SYMMETRY', heading: true },
+    { id: 'sec-symmetry', label: 'SYMMETRY', heading: true, page: 209 },
     { id: 'p22', label: 'Relax constraints' },
     { id: 'p23', label: 'to allow asymmetry,' },
     { id: 'p24', label: 'explore new planes.' },
-    { id: 'sec-seg', label: 'SEGMENTATION', heading: true },
+    { id: 'sec-seg', label: 'SEGMENTATION', heading: true, page: 210 },
     { id: 'p25', label: 'Repeat body modules' },
     { id: 'p26', label: 'like millipedes.' },
-    { id: 'sec-grad', label: 'GRADIENTS', heading: true },
+    { id: 'sec-grad', label: 'GRADIENTS', heading: true, page: 212 },
     { id: 'p27', label: 'Segments now taper,' },
     { id: 'p28', label: 'one gradient per gene.' },
     { id: 'p29', label: 'Richer ecology results.' },
@@ -2833,7 +2847,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     { id: 'p31', label: 'yields botanical forms.' },
     { id: 'p32', label: 'Echinoderms reveal limits.' },
     { id: 'p33', label: 'Breed the alphabet —' },
-    { id: 'sec-evo', label: 'THE POINT', heading: true },
+    { id: 'sec-evo', label: 'THE POINT', heading: true, page: 216 },
     { id: 'p34', label: 'embryology sets limits.' },
     { id: 'p35', label: 'Two rival principles:' },
     { id: 'p36', label: 'genetic system changes' },
@@ -2857,7 +2871,22 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   PARA_INDEX.forEach(item => {
     const a = document.createElement('a');
     a.className = 'pi-entry' + (item.heading ? ' pi-heading' : '');
-    a.textContent = item.label;
+    // Paragraph number prefix for non-headings
+    if (!item.heading) {
+      var num = item.id.replace('p', '');
+      var numSpan = document.createElement('span');
+      numSpan.className = 'pi-num';
+      numSpan.textContent = num;
+      a.appendChild(numSpan);
+    }
+    a.appendChild(document.createTextNode(item.label));
+    // Page number suffix for headings
+    if (item.heading && item.page) {
+      var pageSpan = document.createElement('span');
+      pageSpan.className = 'pi-page';
+      pageSpan.textContent = 'p.\u2009' + item.page;
+      a.appendChild(pageSpan);
+    }
     a.href = '#' + item.id;
     a.dataset.target = item.id;
     a.addEventListener('click', e => {
