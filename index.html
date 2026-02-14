@@ -1119,6 +1119,7 @@
   <p class="publication">Artificial Life, SFI Studies in the Sciences of Complexity,<br>Ed. C. Langton, Addison-Wesley Publishing Company, 1988</p>
 </header>
 <section>
+<h2 id="sec-basic">The Basic Program</h2>
 <p id="p1">A title like "The Evolution of Evolvability" ought to be anathema to a dyed-in-the-wool, radical neo-Darwinian like me! Part of the reason it isn't, is that I really have been led to think differently as a result of creating, and using, computer models of artificial life which, on the face of it, owe more to the imagination than to real biology. The use of artificial life, not as a formal model of real life but as a generator of insight in our understanding of real life, is one that I want to illustrate in this paper. With a program called <em>Blind Watchmaker</em>, I created a world of two-dimensional artificial organisms on the computer screen.<sup>1</sup> Borrowing the word used by Desmond Morris for the animal-like shapes in his surrealistic paintings,<sup>2</sup> I called them biomorphs. My main objectives in designing <em>Blind Watchmaker</em> was to reduce to the barest minimum the extent to which I designed biomorphs. I wanted as much as possible of the biology of biomorphs to emerge. All that I would design was the conditions&mdash;ideally very simple conditions&mdash;under which they might emerge. The process of emergence was to be evolution by the Darwinian process of random mutation followed by nonrandom survival. Once a Darwinian process gets going in a world, it has an open-ended power to generate surprising consequences: us, for example. But before any Darwinian process can get going, there has to be a bare minimum group of conditions set up. These were the conditions that I had to engineer in my computer world:</p>
 </section>
 <section>
@@ -2760,6 +2761,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
 // === Paragraph Index ===
 (function() {
   const PARA_INDEX = [
+    { id: 'sec-basic', label: 'THE BASIC PROGRAM', heading: true },
     { id: 'p1', label: 'Artificial life' },
     { id: 'p2', label: 'needs replicators' },
     { id: 'p3', label: "and Weismann's principle:" },
@@ -2872,6 +2874,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   // Each entry sticks at top of sidebar; next entry pushes it off
   var ENTRY_H = 20; // approx height of one entry line
   var ENTRY_GAP = 1;
+  var TOP_PAD = 24; // breathing room at top of sidebar
 
   function positionEntries() {
     if (!expanded) return;
@@ -2887,7 +2890,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     var tops = new Array(n);
     var maxTop = Infinity;
     for (var i = n - 1; i >= 0; i--) {
-      var sticky = Math.max(0, natural[i]); // stick at viewport top
+      var sticky = Math.max(TOP_PAD, natural[i]); // stick with breathing room
       var pushed = Math.min(sticky, maxTop - ENTRY_H); // pushed up by entry below
       tops[i] = pushed;
       maxTop = pushed - ENTRY_GAP;
@@ -2933,26 +2936,59 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       if (activeIdx >= 0) entries[activeIdx].classList.remove('active');
       entries[bestIdx].classList.add('active');
       activeIdx = bestIdx;
+    }
 
-      // Auto-scroll sidebar to keep active entry visible (condensed only)
-      if (!expanded) {
-        const entry = entries[bestIdx];
-        const container = inner;
-        const entryTop = entry.offsetTop;
-        const entryH = entry.offsetHeight;
-        const scrollTop = container.scrollTop;
-        const containerH = container.clientHeight;
+    // Continuous interpolated scroll tracking (condensed mode)
+    if (!expanded && activeIdx >= 0) {
+      var container = inner;
+      var containerH = container.clientHeight;
 
-        if (entryTop < scrollTop + 60) {
-          container.scrollTo({ top: Math.max(0, entryTop - 60), behavior: 'smooth' });
-        } else if (entryTop + entryH > scrollTop + containerH - 60) {
-          container.scrollTo({ top: entryTop + entryH - containerH + 60, behavior: 'smooth' });
+      // Calculate progress within current paragraph toward next
+      var curEl = document.getElementById(targets[activeIdx]);
+      var nextEl = activeIdx + 1 < targets.length ? document.getElementById(targets[activeIdx + 1]) : null;
+      var progress = 0;
+      if (curEl && nextEl) {
+        var curTop = curEl.getBoundingClientRect().top;
+        var nextTop = nextEl.getBoundingClientRect().top;
+        var span = nextTop - curTop;
+        if (span > 0) progress = Math.max(0, Math.min(1, -curTop / span));
+      } else if (curEl) {
+        // Last entry: use paragraph height
+        var curTop = curEl.getBoundingClientRect().top;
+        progress = Math.max(0, Math.min(1, -curTop / (curEl.offsetHeight || 400)));
+      }
+
+      // Interpolate target scroll between current and next entry positions
+      var curEntry = entries[activeIdx];
+      var nextEntry = activeIdx + 1 < entries.length ? entries[activeIdx + 1] : curEntry;
+      var curOff = curEntry.offsetTop;
+      var nextOff = nextEntry.offsetTop;
+      var targetOff = curOff + (nextOff - curOff) * progress;
+
+      // Center the interpolated position in the sidebar
+      var targetScroll = Math.max(0, Math.min(
+        targetOff - containerH * 0.35,
+        container.scrollHeight - containerH
+      ));
+
+      // Ease toward target (smooth follow)
+      var current = container.scrollTop;
+      var diff = targetScroll - current;
+      if (Math.abs(diff) > 0.5) {
+        container.scrollTop = current + diff * 0.22;
+        // Keep animating until converged
+        if (!scrollRaf) {
+          scrollRaf = requestAnimationFrame(function tick() {
+            scrollRaf = null;
+            if (!ticking) { ticking = true; updateActive(); }
+          });
         }
       }
     }
     ticking = false;
   }
 
+  var scrollRaf = null;
   window.addEventListener('scroll', () => {
     if (!ticking) {
       ticking = true;
