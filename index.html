@@ -470,27 +470,38 @@
     pointer-events: none;
     z-index: 100;
   }
+  .pi-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 24px;
+    padding: 0 8px;
+    border-bottom: 1px solid var(--border);
+    pointer-events: auto;
+  }
+  .pi-label {
+    font-family: system-ui, sans-serif;
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
   .pi-toggle {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    z-index: 101;
-    background: var(--bg);
+    background: none;
     border: 1px solid var(--border);
     border-radius: 3px;
     color: var(--text-dim);
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     font-family: system-ui, sans-serif;
-    padding: 2px 6px;
+    padding: 1px 5px;
     cursor: pointer;
-    pointer-events: auto;
     letter-spacing: 0.03em;
   }
-  .pi-toggle:hover { color: var(--text); border-color: var(--accent); background: var(--bg); }
+  .pi-toggle:hover { color: var(--text); border-color: var(--accent); }
   .pi-inner {
     position: absolute;
     right: 0;
-    top: 0;
+    top: 24px;
     bottom: 0;
     width: 100%;
     overflow-y: auto;
@@ -508,7 +519,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: none;
+    transition: opacity 0.15s;
   }
   .pi-entry {
     display: block;
@@ -526,7 +537,7 @@
     color: var(--text);
   }
   .pi-entry.active {
-    color: var(--accent);
+    color: var(--text);
     border-left-color: var(--accent);
     background: rgba(88, 166, 255, 0.06);
   }
@@ -1108,7 +1119,10 @@
 </head>
 <body>
 <nav id="para-index" aria-label="Paragraph index">
-  <button class="pi-toggle" title="Toggle index layout">expand</button>
+  <div class="pi-header">
+    <span class="pi-label">index</span>
+    <button class="pi-toggle" title="Toggle index layout">expand</button>
+  </div>
   <div class="pi-inner"></div>
 </nav>
 <article>
@@ -2858,7 +2872,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     } else {
       inner.classList.remove('pi-expanded');
       toggleBtn.textContent = 'expand';
-      entries.forEach(function(a) { a.style.top = ''; });
+      entries.forEach(function(a) { a.style.top = ''; a.style.opacity = ''; });
       inner.style.paddingTop = '';
       alignTop();
     }
@@ -2870,33 +2884,31 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     applyMode();
   });
 
-  // Sticky-summary positioning (expanded mode)
-  // Each entry sticks at top of sidebar; next entry pushes it off
+  // Paragraph-bounded positioning (expanded mode)
+  // Each entry lives within its own paragraph's vertical region
   var ENTRY_H = 20; // approx height of one entry line
-  var ENTRY_GAP = 1;
-  var TOP_PAD = 24; // breathing room at top of sidebar
+  var TOP_PAD = 32; // breathing room below header bar
 
   function positionEntries() {
     if (!expanded) return;
     var n = entries.length;
-    // First pass: get natural positions (paragraph tops in viewport coords)
-    var natural = [];
     for (var i = 0; i < n; i++) {
       var el = document.getElementById(entries[i].dataset.target);
-      natural[i] = el ? el.getBoundingClientRect().top : 99999;
-    }
-    // Second pass: bottom-up. Each entry sticks at top (max 0) but gets
-    // pushed off-screen (negative) by the entry below it.
-    var tops = new Array(n);
-    var maxTop = Infinity;
-    for (var i = n - 1; i >= 0; i--) {
-      var sticky = Math.max(TOP_PAD, natural[i]); // stick with breathing room
-      var pushed = Math.min(sticky, maxTop - ENTRY_H); // pushed up by entry below
-      tops[i] = pushed;
-      maxTop = pushed - ENTRY_GAP;
-    }
-    for (var i = 0; i < n; i++) {
-      entries[i].style.top = tops[i] + 'px';
+      if (!el) continue;
+      var paraTop = el.getBoundingClientRect().top;
+      // Region bottom = next paragraph's top (or this paragraph's bottom for last)
+      var regionBottom;
+      if (i + 1 < n) {
+        var nextEl = document.getElementById(entries[i + 1].dataset.target);
+        regionBottom = nextEl ? nextEl.getBoundingClientRect().top : paraTop + el.offsetHeight;
+      } else {
+        regionBottom = paraTop + el.offsetHeight;
+      }
+      // Clamp: stick at TOP_PAD, but pushed off when next entry needs the space
+      var pos = Math.min(regionBottom - ENTRY_H, Math.max(TOP_PAD, paraTop));
+      entries[i].style.top = pos + 'px';
+      // Fade when entry has slid above header
+      entries[i].style.opacity = pos < TOP_PAD - 4 ? '0' : pos < TOP_PAD + 2 ? '0.4' : '1';
     }
   }
 
@@ -2907,26 +2919,23 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   let activeIdx = -1;
 
   function updateActive() {
-    const threshold = window.innerHeight * 0.15;
+    const EDGE_THRESH = 20; // px below viewport top before switching
     let bestIdx = 0;
-    let bestDist = Infinity;
 
+    // Active = first entry whose paragraph bottom is still below viewport top
+    let found = false;
     for (let i = 0; i < targets.length; i++) {
       const el = document.getElementById(targets[i]);
       if (!el) continue;
-      const top = el.getBoundingClientRect().top;
-      const dist = Math.abs(top - threshold);
-      if (top <= threshold + 10) {
-        if (top > -window.innerHeight) {
-          bestIdx = i;
-          bestDist = dist;
-        }
-      } else if (bestDist === Infinity) {
-        if (dist < bestDist) {
-          bestIdx = i;
-          bestDist = dist;
-        }
+      if (el.getBoundingClientRect().bottom >= EDGE_THRESH) {
+        bestIdx = i;
+        found = true;
+        break;
       }
+    }
+    // If all paragraphs are above viewport, select the last one
+    if (!found) {
+      bestIdx = targets.length - 1;
     }
 
     // Update expanded entry positions every frame
@@ -2971,24 +2980,11 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
         container.scrollHeight - containerH
       ));
 
-      // Ease toward target (smooth follow)
-      var current = container.scrollTop;
-      var diff = targetScroll - current;
-      if (Math.abs(diff) > 0.5) {
-        container.scrollTop = current + diff * 0.22;
-        // Keep animating until converged
-        if (!scrollRaf) {
-          scrollRaf = requestAnimationFrame(function tick() {
-            scrollRaf = null;
-            if (!ticking) { ticking = true; updateActive(); }
-          });
-        }
-      }
+      // Direct assignment — frame-synced, no easing lag
+      container.scrollTop = targetScroll;
     }
     ticking = false;
   }
-
-  var scrollRaf = null;
   window.addEventListener('scroll', () => {
     if (!ticking) {
       ticking = true;
