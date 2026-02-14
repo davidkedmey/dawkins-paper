@@ -741,6 +741,26 @@
     color: var(--text);
     border-color: var(--accent);
   }
+  .fc-drawer-io {
+    display: flex;
+    gap: 6px;
+    padding: 6px 16px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .fc-drawer-io button {
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    font-family: system-ui, sans-serif;
+    background: var(--surface);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .fc-drawer-io button:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
   .fc-drawer-cards {
     flex: 1;
     overflow-y: auto;
@@ -823,6 +843,7 @@
   .fc-dot:hover { transform: scale(1.5); }
   .fc-dot-cloze { background: var(--accent); }
   .fc-dot-qa { background: #f0883e; }
+  .fc-dot-note { background: #8b949e; border-radius: 2px; }
   .fc-dot.fc-dot-active { box-shadow: 0 0 0 3px rgba(88,166,255,0.35); transform: scale(1.5); }
 
   /* ── Dot popover ── */
@@ -918,6 +939,10 @@
   mark.fc-hl-qa {
     background: rgba(240,136,62,0.35);
     border-bottom-color: rgba(240,136,62,0.6);
+  }
+  mark.fc-hl-note {
+    background: rgba(139,148,158,0.25);
+    border-bottom-color: rgba(139,148,158,0.5);
   }
 
   .fc-card-para {
@@ -2874,7 +2899,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   // Popup
   const popup = document.createElement('div');
   popup.className = 'fc-popup';
-  popup.innerHTML = '<button data-fc="cloze">Cloze</button><button data-fc="qa">Q</button>';
+  popup.innerHTML = '<button data-fc="cloze">Cloze</button><button data-fc="qa">Q</button><button data-fc="note">Note</button>';
   document.body.appendChild(popup);
 
   // Editor (shared for cloze + Q&A)
@@ -2913,6 +2938,11 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       '<button data-fmt="csv">CSV</button>' +
       '<button data-fmt="json">JSON</button>' +
     '</div>' +
+    '<div class="fc-drawer-io">' +
+      '<button class="fc-import-btn">Import</button>' +
+      '<button class="fc-export-full-btn">Export Deck</button>' +
+    '</div>' +
+    '<input type="file" class="fc-import-input" accept=".json" style="display:none">' +
     '<div class="fc-drawer-cards"></div>';
   document.body.appendChild(drawer);
 
@@ -3048,6 +3078,14 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       hint.textContent = 'Click words to blank them out';
       qInput.style.display = 'none';
       aInput.style.display = 'none';
+    } else if (mode === 'note') {
+      label.textContent = 'Note';
+      wordsEl.style.display = 'none';
+      hint.style.display = 'none';
+      qInput.style.display = 'none';
+      aInput.style.display = '';
+      aInput.value = '';
+      aInput.placeholder = 'Note...';
     } else {
       label.textContent = 'Q & A';
       wordsEl.style.display = 'none';
@@ -3065,6 +3103,8 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
 
     if (mode === 'qa') {
       setTimeout(function() { qInput.focus(); }, 50);
+    } else if (mode === 'note') {
+      setTimeout(function() { aInput.focus(); }, 50);
     }
   }
 
@@ -3087,6 +3127,9 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     }
     if (action === 'qa') {
       showEditor('qa');
+    }
+    if (action === 'note') {
+      showEditor('note');
     }
   });
 
@@ -3133,6 +3176,28 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       flashFab();
       renderDots();
       if (studyMode) { dueQueue.push(card); updateStudyBanner(); }
+      window.getSelection().removeAllRanges();
+
+    } else if (editorMode === 'note') {
+      // Note mode
+      var noteText = editor.querySelector('.fc-a-input').value.trim();
+      if (!noteText) { editor.querySelector('.fc-a-input').focus(); return; }
+
+      var card = {
+        id: 'n_' + Date.now(),
+        type: 'note',
+        paragraphId: selParagraph ? selParagraph.id : '',
+        anchor: selText.slice(0, 50),
+        source: selText,
+        front: noteText,
+        back: '',
+        created: Date.now()
+      };
+      cards.push(card);
+      save();
+      hideEditor();
+      flashFab();
+      renderDots();
       window.getSelection().removeAllRanges();
 
     } else {
@@ -3231,10 +3296,11 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       const el = document.createElement('div');
       el.className = 'fc-card';
       el.dataset.idx = i;
+      var typeLabel = c.type === 'cloze' ? 'Cloze' : c.type === 'qa' ? 'Q&A' : 'Note';
       el.innerHTML =
-        '<div class="fc-card-type">' + (c.type === 'cloze' ? 'Cloze' : 'Q&A') + '</div>' +
+        '<div class="fc-card-type">' + typeLabel + '</div>' +
         '<div class="fc-card-front">' + escHtml(c.front) + '</div>' +
-        '<div class="fc-card-back">' + escHtml(c.back) + '</div>' +
+        (c.back ? '<div class="fc-card-back">' + escHtml(c.back) + '</div>' : '') +
         '<button class="fc-card-del" title="Delete">\u00d7</button>' +
         '<div class="fc-card-para">\u00b6 ' + c.paragraphId + '</div>';
       cardContainer.appendChild(el);
@@ -3292,6 +3358,8 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
         var i = 0;
         var line = c.front.replace(/___/g, function() { return '==' + (answers[i++] || '???') + '=='; });
         md += line + '\n<!--SR:' + c.paragraphId + '-->\n\n';
+      } else if (c.type === 'note') {
+        md += '> ' + c.front.replace(/\n/g, '\n> ') + '\n<!--Note:' + c.paragraphId + '-->\n\n';
       } else {
         md += c.front + '\n?\n' + c.back + '\n<!--SR:' + c.paragraphId + '-->\n\n';
       }
@@ -3302,6 +3370,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   function exportCSV() {
     var csv = 'front\tback\ttags\n';
     cards.forEach(function(c) {
+      if (c.type === 'note') return; // skip notes in Anki export
       var front, back;
       if (c.type === 'cloze') {
         var answers = c.back.split(', ');
@@ -3320,6 +3389,53 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   function exportJSON() {
     downloadBlob(JSON.stringify(cards, null, 2), 'dawkins-flashcards.json', 'application/json');
   }
+
+  // ── Full deck import/export ──
+  function exportFullDeck() {
+    downloadBlob(JSON.stringify(cards, null, 2), 'dawkins-deck-backup.json', 'application/json');
+  }
+
+  function importDeck(file) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var imported = JSON.parse(e.target.result);
+        if (!Array.isArray(imported)) { alert('Invalid deck file.'); return; }
+        // Merge: update existing by ID, add new ones
+        var existingIds = {};
+        cards.forEach(function(c, i) { existingIds[c.id] = i; });
+        var added = 0, updated = 0;
+        imported.forEach(function(ic) {
+          if (!ic.id || !ic.type) return; // skip malformed
+          if (existingIds[ic.id] !== undefined) {
+            cards[existingIds[ic.id]] = ic;
+            updated++;
+          } else {
+            cards.push(ic);
+            added++;
+          }
+        });
+        save();
+        renderCards();
+        renderDots();
+        alert('Imported: ' + added + ' added, ' + updated + ' updated.');
+      } catch (err) {
+        alert('Error reading file: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  drawer.querySelector('.fc-export-full-btn').addEventListener('click', exportFullDeck);
+  drawer.querySelector('.fc-import-btn').addEventListener('click', function() {
+    drawer.querySelector('.fc-import-input').click();
+  });
+  drawer.querySelector('.fc-import-input').addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+      importDeck(e.target.files[0]);
+      e.target.value = ''; // reset for re-import
+    }
+  });
 
   // ── Margin dots + popover ──
   const popover = document.createElement('div');
@@ -3388,13 +3504,13 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       range.setStart(startNode, startIdx);
       range.setEnd(endNode, endIdx);
       var mark = document.createElement('mark');
-      mark.className = 'fc-hl' + (card.type === 'qa' ? ' fc-hl-qa' : '');
+      mark.className = 'fc-hl' + (card.type === 'qa' ? ' fc-hl-qa' : card.type === 'note' ? ' fc-hl-note' : '');
       range.surroundContents(mark);
       return;
     }
 
     // Multi-node: wrap each text segment individually
-    var hlClass = 'fc-hl' + (card.type === 'qa' ? ' fc-hl-qa' : '');
+    var hlClass = 'fc-hl' + (card.type === 'qa' ? ' fc-hl-qa' : card.type === 'note' ? ' fc-hl-note' : '');
     var nodes = [];
     walker = document.createTreeWalker(para, NodeFilter.SHOW_TEXT);
     var inRange = false;
@@ -3446,7 +3562,13 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     var ef = popover.querySelector('.fc-popover-ef');
     var eb = popover.querySelector('.fc-popover-eb');
     ef.value = c.front;
-    eb.value = c.back;
+    ef.placeholder = c.type === 'note' ? 'Note' : 'Front';
+    if (c.type === 'note') {
+      eb.style.display = 'none';
+    } else {
+      eb.style.display = '';
+      eb.value = c.back;
+    }
     setTimeout(function() { ef.focus(); }, 30);
   });
 
@@ -3454,13 +3576,14 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     popover.querySelector('.fc-popover-view').style.display = '';
     popover.querySelector('.fc-popover-edit').style.display = '';
     popover.querySelector('.fc-popover-editing').style.display = 'none';
+    popover.querySelector('.fc-popover-eb').style.display = '';
   });
 
   popover.querySelector('.fc-popover-save').addEventListener('click', function() {
     if (!activePopoverCardObj) return;
     var ef = popover.querySelector('.fc-popover-ef').value.trim();
-    var eb = popover.querySelector('.fc-popover-eb').value.trim();
     if (!ef) return;
+    var eb = activePopoverCardObj.type === 'note' ? '' : popover.querySelector('.fc-popover-eb').value.trim();
     // Update card in array
     for (var i = 0; i < cards.length; i++) {
       if (cards[i].id === activePopoverCardObj.id) {
@@ -3476,6 +3599,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     popover.querySelector('.fc-popover-view').style.display = '';
     popover.querySelector('.fc-popover-edit').style.display = '';
     popover.querySelector('.fc-popover-editing').style.display = 'none';
+    popover.querySelector('.fc-popover-eb').style.display = '';
     activePopoverCardObj.front = ef;
     activePopoverCardObj.back = eb;
   });
@@ -3498,9 +3622,19 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     var front = popover.querySelector('.fc-popover-front');
     var back = popover.querySelector('.fc-popover-back');
 
-    label.textContent = card.type === 'cloze' ? 'Cloze' : 'Q & A';
+    label.textContent = card.type === 'cloze' ? 'Cloze' : card.type === 'qa' ? 'Q & A' : 'Note';
     front.textContent = card.front;
     back.textContent = card.back;
+
+    // Hide back section for notes
+    var divider = popover.querySelector('.fc-popover-divider');
+    if (card.type === 'note') {
+      back.style.display = 'none';
+      divider.style.display = 'none';
+    } else {
+      back.style.display = '';
+      divider.style.display = '';
+    }
 
     // Reset to view mode
     popover.querySelector('.fc-popover-view').style.display = '';
@@ -3557,14 +3691,14 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       byPara[pid].forEach(function(card) {
         var dot = document.createElement('span');
         dot.className = 'fc-dot fc-dot-' + card.type;
-        dot.title = card.type === 'cloze' ? 'Cloze card' : 'Q&A card';
+        dot.title = card.type === 'cloze' ? 'Cloze card' : card.type === 'qa' ? 'Q&A card' : 'Note';
         dot.dataset.cardId = card.id;
         if (studyMode && isDue(card)) dot.classList.add('fc-due');
         dot.addEventListener('click', function(e) {
           e.stopPropagation();
           if (studyMode && isDue(card)) {
             showStudyPopover(dot, card);
-          } else if (!studyMode) {
+          } else {
             showPopover(dot, card);
           }
         });
@@ -3607,6 +3741,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   var studyPopoverCardObj = null;
 
   function isDue(card) {
+    if (card.type === 'note') return false;
     return !card.nextReview || card.nextReview <= Date.now();
   }
 
