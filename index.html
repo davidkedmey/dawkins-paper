@@ -802,6 +802,73 @@
   }
   .fc-card:hover .fc-card-del { opacity: 1; }
   .fc-card-del:hover { color: #f85149; }
+
+  /* ── Margin dots ── */
+  .fc-dot-wrap {
+    position: absolute;
+    right: -28px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 50;
+  }
+  .fc-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    flex-shrink: 0;
+  }
+  .fc-dot:hover { transform: scale(1.5); }
+  .fc-dot-cloze { background: var(--accent); }
+  .fc-dot-qa { background: #f0883e; }
+  .fc-dot.fc-dot-active { box-shadow: 0 0 0 3px rgba(88,166,255,0.35); transform: scale(1.5); }
+
+  /* ── Dot popover ── */
+  .fc-popover {
+    position: absolute;
+    z-index: 200;
+    width: 300px;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    font-family: system-ui, sans-serif;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text);
+    display: none;
+  }
+  .fc-popover.fc-visible { display: block; }
+  .fc-popover-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+  .fc-popover-front { margin-bottom: 6px; }
+  .fc-popover-divider {
+    border: 0;
+    border-top: 1px dashed var(--border);
+    margin: 6px 0;
+  }
+  .fc-popover-back { color: var(--text-dim); }
+
+  /* ── Inline text highlight ── */
+  mark.fc-hl {
+    background: rgba(88,166,255,0.18);
+    color: inherit;
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+  mark.fc-hl-qa {
+    background: rgba(240,136,62,0.18);
+  }
+
   .fc-card-para {
     font-size: 0.65rem;
     color: var(--text-dim);
@@ -2609,7 +2676,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   'use strict';
 
   const STORAGE_KEY = 'fc_dawkins_evoevolvability';
-  const EXCLUDE = '.widget-box, .widget-graduation, figure, .fc-popup, .fc-drawer, .fc-editor, .fc-fab, .fc-overlay';
+  const EXCLUDE = '.widget-box, .widget-graduation, figure, .fc-popup, .fc-drawer, .fc-editor, .fc-fab, .fc-overlay, .fc-dot-wrap, .fc-popover';
   let cards = [];
   let drawerOpen = false;
 
@@ -2873,6 +2940,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
         type: 'cloze',
         paragraphId: selParagraph ? selParagraph.id : '',
         anchor: selText.slice(0, 50),
+        source: selText,
         front: front,
         back: backs.join(', '),
         created: Date.now()
@@ -2881,6 +2949,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       save();
       hideEditor();
       flashFab();
+      renderDots();
       window.getSelection().removeAllRanges();
 
     } else {
@@ -2894,6 +2963,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
         type: 'qa',
         paragraphId: selParagraph ? selParagraph.id : '',
         anchor: selText.slice(0, 50),
+        source: selText,
         front: q,
         back: a || selText,
         created: Date.now()
@@ -2902,6 +2972,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       save();
       hideEditor();
       flashFab();
+      renderDots();
       window.getSelection().removeAllRanges();
     }
   });
@@ -2978,6 +3049,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       cards.splice(idx, 1);
       save();
       renderCards();
+      renderDots();
       return;
     }
     const card = e.target.closest('.fc-card');
@@ -3044,9 +3116,159 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     downloadBlob(JSON.stringify(cards, null, 2), 'dawkins-flashcards.json', 'application/json');
   }
 
+  // ── Margin dots + popover ──
+  const popover = document.createElement('div');
+  popover.className = 'fc-popover';
+  popover.innerHTML =
+    '<div class="fc-popover-label"></div>' +
+    '<div class="fc-popover-front"></div>' +
+    '<hr class="fc-popover-divider">' +
+    '<div class="fc-popover-back"></div>';
+  document.body.appendChild(popover);
+
+  let activePopoverCard = null;
+
+  function clearHighlights() {
+    document.querySelectorAll('mark.fc-hl').forEach(function(m) {
+      var parent = m.parentNode;
+      parent.replaceChild(document.createTextNode(m.textContent), m);
+      parent.normalize();
+    });
+  }
+
+  function highlightSource(card) {
+    var para = document.getElementById(card.paragraphId);
+    if (!para) return;
+    var src = card.source || card.anchor;
+    if (!src) return;
+
+    // Walk text nodes to find the source text
+    var walker = document.createTreeWalker(para, NodeFilter.SHOW_TEXT);
+    var node;
+    while (node = walker.nextNode()) {
+      var idx = node.textContent.indexOf(src);
+      if (idx !== -1) {
+        var range = document.createRange();
+        range.setStart(node, idx);
+        range.setEnd(node, idx + src.length);
+        var mark = document.createElement('mark');
+        mark.className = 'fc-hl' + (card.type === 'qa' ? ' fc-hl-qa' : '');
+        range.surroundContents(mark);
+        return;
+      }
+    }
+  }
+
+  function hidePopover() {
+    popover.classList.remove('fc-visible');
+    clearHighlights();
+    document.querySelectorAll('.fc-dot-active').forEach(function(d) {
+      d.classList.remove('fc-dot-active');
+    });
+    activePopoverCard = null;
+  }
+
+  function showPopover(dot, card) {
+    // Toggle if same card
+    if (activePopoverCard === card.id) { hidePopover(); return; }
+
+    clearHighlights();
+    document.querySelectorAll('.fc-dot-active').forEach(function(d) {
+      d.classList.remove('fc-dot-active');
+    });
+
+    activePopoverCard = card.id;
+    dot.classList.add('fc-dot-active');
+
+    // Fill popover content
+    var label = popover.querySelector('.fc-popover-label');
+    var front = popover.querySelector('.fc-popover-front');
+    var back = popover.querySelector('.fc-popover-back');
+
+    if (card.type === 'cloze') {
+      label.textContent = 'Cloze';
+      front.textContent = card.front;
+      back.textContent = card.back;
+    } else {
+      label.textContent = 'Q & A';
+      front.textContent = card.front;
+      back.textContent = card.back;
+    }
+
+    // Position popover to the right of the dot
+    var dotRect = dot.getBoundingClientRect();
+    var left = dotRect.right + 8 + window.scrollX;
+    var top = dotRect.top - 8 + window.scrollY;
+
+    // If too far right, flip to left of dot
+    if (left + 310 > window.innerWidth) {
+      left = dotRect.left - 310 + window.scrollX;
+    }
+    // Clamp vertical
+    top = Math.max(8 + window.scrollY, top);
+
+    popover.style.left = left + 'px';
+    popover.style.top = top + 'px';
+    popover.classList.add('fc-visible');
+
+    // Highlight source text
+    highlightSource(card);
+  }
+
+  function renderDots() {
+    // Remove existing dot wraps
+    document.querySelectorAll('.fc-dot-wrap').forEach(function(w) { w.remove(); });
+    hidePopover();
+
+    // Group cards by paragraph
+    var byPara = {};
+    cards.forEach(function(c) {
+      if (!c.paragraphId) return;
+      if (!byPara[c.paragraphId]) byPara[c.paragraphId] = [];
+      byPara[c.paragraphId].push(c);
+    });
+
+    Object.keys(byPara).forEach(function(pid) {
+      var para = document.getElementById(pid);
+      if (!para) return;
+
+      // Ensure paragraph is positioned for absolute children
+      if (getComputedStyle(para).position === 'static') {
+        para.style.position = 'relative';
+      }
+
+      var wrap = document.createElement('span');
+      wrap.className = 'fc-dot-wrap';
+      // Vertically center the dot cluster
+      wrap.style.top = '4px';
+
+      byPara[pid].forEach(function(card) {
+        var dot = document.createElement('span');
+        dot.className = 'fc-dot fc-dot-' + card.type;
+        dot.title = card.type === 'cloze' ? 'Cloze card' : 'Q&A card';
+        dot.dataset.cardId = card.id;
+        dot.addEventListener('click', function(e) {
+          e.stopPropagation();
+          showPopover(dot, card);
+        });
+        wrap.appendChild(dot);
+      });
+
+      para.appendChild(wrap);
+    });
+  }
+
+  // Dismiss popover on click outside
+  document.addEventListener('mousedown', function(e) {
+    if (activePopoverCard && e.target.closest && !e.target.closest('.fc-popover') && !e.target.closest('.fc-dot')) {
+      hidePopover();
+    }
+  });
+
   // ── Keyboard: Escape closes drawer/editor ──
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
+      if (activePopoverCard) { hidePopover(); return; }
       if (drawerOpen) closeDrawer();
       hideEditor();
       hidePopup();
@@ -3056,6 +3278,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   // ── Init ──
   load();
   updateFab();
+  renderDots();
 })();
 </script>
 </body>
