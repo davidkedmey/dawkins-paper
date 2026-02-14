@@ -2913,13 +2913,16 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     guides.push({ top: gt, bot: gb });
   });
 
-  // Alt+click toggle button to show/hide debug guides
-  toggleBtn.addEventListener('click', function(e) {
-    if (e.altKey) {
-      e.stopImmediatePropagation();
-      inner.classList.toggle('pi-debug');
-    }
-  }, true);
+  // Debug toggle button
+  var debugBtn = document.createElement('button');
+  debugBtn.className = 'pi-toggle';
+  debugBtn.textContent = 'guides';
+  debugBtn.style.marginLeft = '4px';
+  debugBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    inner.classList.toggle('pi-debug');
+  });
+  document.querySelector('.pi-header').appendChild(debugBtn);
 
   function positionEntries() {
     if (!expanded) return;
@@ -2927,16 +2930,12 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     for (var i = 0; i < n; i++) {
       var el = document.getElementById(entries[i].dataset.target);
       if (!el) continue;
-      var paraTop = el.getBoundingClientRect().top;
-      // Region bottom = next paragraph's top (or this paragraph's bottom for last)
-      var regionBottom;
-      if (i + 1 < n) {
-        var nextEl = document.getElementById(entries[i + 1].dataset.target);
-        regionBottom = nextEl ? nextEl.getBoundingClientRect().top : paraTop + el.offsetHeight;
-      } else {
-        regionBottom = paraTop + el.offsetHeight;
-      }
-      // Clamp: stick at TOP_PAD, but pushed off when next entry needs the space
+      var rect = el.getBoundingClientRect();
+      var paraTop = rect.top;
+      var paraBottom = rect.bottom;
+      // Region bottom = this paragraph's own bottom (entry must stay within its paragraph)
+      var regionBottom = paraBottom;
+      // Clamp: stick at TOP_PAD, but pushed off when paragraph bottom approaches
       var pos = Math.min(regionBottom - ENTRY_H, Math.max(TOP_PAD, paraTop));
       entries[i].style.top = pos + 'px';
       // Fade when entry has slid above header
