@@ -558,8 +558,8 @@
   .fc-editor {
     position: absolute;
     z-index: 200;
-    width: 360px;
-    padding: 12px;
+    width: 400px;
+    padding: 14px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -857,6 +857,55 @@
     margin: 6px 0;
   }
   .fc-popover-back { color: var(--text-dim); }
+  .fc-popover-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .fc-popover-edit {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .fc-popover-edit:hover { color: var(--accent); background: rgba(88,166,255,0.1); }
+  .fc-popover textarea {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 0.8rem;
+    font-family: system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 6px;
+    resize: vertical;
+  }
+  .fc-popover textarea:focus { outline: none; border-color: var(--accent); }
+  .fc-popover-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  .fc-popover-actions button {
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .fc-popover-actions button:last-child {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
 
   /* ── Inline text highlight ── */
   mark.fc-hl {
@@ -2708,8 +2757,8 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     '<div class="fc-editor-label"></div>' +
     '<div class="fc-words"></div>' +
     '<div class="fc-hint"></div>' +
-    '<input type="text" class="fc-q-input" placeholder="Question...">' +
-    '<textarea class="fc-a-input" rows="2" placeholder="Answer (optional)"></textarea>' +
+    '<textarea class="fc-q-input" rows="2" placeholder="Question..."></textarea>' +
+    '<textarea class="fc-a-input" rows="4" placeholder="Answer (optional)"></textarea>' +
     '<div class="fc-editor-btns"><button class="fc-cancel">Cancel</button><button class="fc-save">Save</button></div>';
   document.body.appendChild(editor);
 
@@ -3122,13 +3171,21 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   const popover = document.createElement('div');
   popover.className = 'fc-popover';
   popover.innerHTML =
-    '<div class="fc-popover-label"></div>' +
-    '<div class="fc-popover-front"></div>' +
-    '<hr class="fc-popover-divider">' +
-    '<div class="fc-popover-back"></div>';
+    '<div class="fc-popover-header"><div class="fc-popover-label"></div><button class="fc-popover-edit" title="Edit">\u270E</button></div>' +
+    '<div class="fc-popover-view">' +
+      '<div class="fc-popover-front"></div>' +
+      '<hr class="fc-popover-divider">' +
+      '<div class="fc-popover-back"></div>' +
+    '</div>' +
+    '<div class="fc-popover-editing" style="display:none">' +
+      '<textarea class="fc-popover-ef" rows="2" placeholder="Front"></textarea>' +
+      '<textarea class="fc-popover-eb" rows="3" placeholder="Back"></textarea>' +
+      '<div class="fc-popover-actions"><button class="fc-popover-cancel">Cancel</button><button class="fc-popover-save">Save</button></div>' +
+    '</div>';
   document.body.appendChild(popover);
 
   let activePopoverCard = null;
+  let activePopoverCardObj = null;
 
   function clearHighlights() {
     document.querySelectorAll('mark.fc-hl').forEach(function(m) {
@@ -3221,7 +3278,53 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       d.classList.remove('fc-dot-active');
     });
     activePopoverCard = null;
+    activePopoverCardObj = null;
   }
+
+  // ── Popover edit handlers ──
+  popover.querySelector('.fc-popover-edit').addEventListener('click', function() {
+    if (!activePopoverCardObj) return;
+    var c = activePopoverCardObj;
+    popover.querySelector('.fc-popover-view').style.display = 'none';
+    popover.querySelector('.fc-popover-edit').style.display = 'none';
+    var editDiv = popover.querySelector('.fc-popover-editing');
+    editDiv.style.display = '';
+    var ef = popover.querySelector('.fc-popover-ef');
+    var eb = popover.querySelector('.fc-popover-eb');
+    ef.value = c.front;
+    eb.value = c.back;
+    setTimeout(function() { ef.focus(); }, 30);
+  });
+
+  popover.querySelector('.fc-popover-cancel').addEventListener('click', function() {
+    popover.querySelector('.fc-popover-view').style.display = '';
+    popover.querySelector('.fc-popover-edit').style.display = '';
+    popover.querySelector('.fc-popover-editing').style.display = 'none';
+  });
+
+  popover.querySelector('.fc-popover-save').addEventListener('click', function() {
+    if (!activePopoverCardObj) return;
+    var ef = popover.querySelector('.fc-popover-ef').value.trim();
+    var eb = popover.querySelector('.fc-popover-eb').value.trim();
+    if (!ef) return;
+    // Update card in array
+    for (var i = 0; i < cards.length; i++) {
+      if (cards[i].id === activePopoverCardObj.id) {
+        cards[i].front = ef;
+        cards[i].back = eb;
+        break;
+      }
+    }
+    save();
+    // Update view
+    popover.querySelector('.fc-popover-front').textContent = ef;
+    popover.querySelector('.fc-popover-back').textContent = eb;
+    popover.querySelector('.fc-popover-view').style.display = '';
+    popover.querySelector('.fc-popover-edit').style.display = '';
+    popover.querySelector('.fc-popover-editing').style.display = 'none';
+    activePopoverCardObj.front = ef;
+    activePopoverCardObj.back = eb;
+  });
 
   function showPopover(dot, card) {
     // Toggle if same card
@@ -3233,6 +3336,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     });
 
     activePopoverCard = card.id;
+    activePopoverCardObj = card;
     dot.classList.add('fc-dot-active');
 
     // Fill popover content
@@ -3240,15 +3344,14 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     var front = popover.querySelector('.fc-popover-front');
     var back = popover.querySelector('.fc-popover-back');
 
-    if (card.type === 'cloze') {
-      label.textContent = 'Cloze';
-      front.textContent = card.front;
-      back.textContent = card.back;
-    } else {
-      label.textContent = 'Q & A';
-      front.textContent = card.front;
-      back.textContent = card.back;
-    }
+    label.textContent = card.type === 'cloze' ? 'Cloze' : 'Q & A';
+    front.textContent = card.front;
+    back.textContent = card.back;
+
+    // Reset to view mode
+    popover.querySelector('.fc-popover-view').style.display = '';
+    popover.querySelector('.fc-popover-editing').style.display = 'none';
+    popover.querySelector('.fc-popover-edit').style.display = '';
 
     // Position popover to the right of the dot
     var dotRect = dot.getBoundingClientRect();
