@@ -598,8 +598,8 @@
     pointer-events: none;
     display: none;
   }
-  .pi-expanded ~ .pi-bracket,
-  .pi-expanded ~ .pi-connector { display: block; }
+  .pi-brackets .pi-expanded ~ .pi-bracket,
+  .pi-brackets .pi-expanded ~ .pi-connector { display: block; }
   .pi-entry.pi-heading {
     font-size: 0.65rem;
     font-weight: 700;
@@ -1179,6 +1179,7 @@
   <button class="pi-gear" title="Index settings">&#9881;</button>
   <div class="pi-menu">
     <button data-action="toggle-mode">condense</button>
+    <button data-action="toggle-brackets">brackets</button>
     <button data-action="toggle-guides">guides</button>
   </div>
 </nav>
@@ -2970,6 +2971,15 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
 
   if (guidesBtn) guidesBtn.addEventListener('click', function() {
     inner.classList.toggle('pi-debug');
+    menu.classList.remove('open');
+  });
+
+  // Brackets toggle
+  var bracketsBtn = document.querySelector('[data-action="toggle-brackets"]');
+  if (localStorage.getItem('pi_brackets') === 'on') nav.classList.add('pi-brackets');
+  if (bracketsBtn) bracketsBtn.addEventListener('click', function() {
+    nav.classList.toggle('pi-brackets');
+    localStorage.setItem('pi_brackets', nav.classList.contains('pi-brackets') ? 'on' : 'off');
     menu.classList.remove('open');
   });
 
