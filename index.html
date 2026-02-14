@@ -470,38 +470,57 @@
     pointer-events: none;
     z-index: 100;
   }
-  .pi-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 24px;
-    padding: 0 8px;
-    border-bottom: 1px solid var(--border);
-    pointer-events: auto;
-  }
-  .pi-label {
-    font-family: system-ui, sans-serif;
-    font-size: 0.6rem;
-    color: var(--text-dim);
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-  .pi-toggle {
+  .pi-gear {
+    position: absolute;
+    bottom: 12px;
+    right: 8px;
+    width: 22px;
+    height: 22px;
     background: none;
     border: 1px solid var(--border);
-    border-radius: 3px;
+    border-radius: 4px;
     color: var(--text-dim);
-    font-size: 0.55rem;
-    font-family: system-ui, sans-serif;
-    padding: 1px 5px;
+    font-size: 13px;
     cursor: pointer;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+  }
+  .pi-gear:hover { color: var(--text); border-color: var(--accent); }
+  .pi-menu {
+    position: absolute;
+    bottom: 42px;
+    right: 8px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 0;
+    pointer-events: auto;
+    display: none;
+    z-index: 2;
+  }
+  .pi-menu.open { display: block; }
+  .pi-menu button {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 0.6rem;
+    font-family: system-ui, sans-serif;
+    padding: 4px 10px;
+    cursor: pointer;
+    text-align: left;
+    white-space: nowrap;
     letter-spacing: 0.03em;
   }
-  .pi-toggle:hover { color: var(--text); border-color: var(--accent); }
+  .pi-menu button:hover { color: var(--text); }
   .pi-inner {
     position: absolute;
     right: 0;
-    top: 24px;
+    top: 0;
     bottom: 0;
     width: 100%;
     overflow-y: auto;
@@ -531,7 +550,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    transition: opacity 0.15s;
   }
   .pi-entry {
     display: block;
@@ -541,17 +559,10 @@
     color: var(--text-dim);
     text-decoration: none;
     padding: 2px 8px;
-    border-left: 2px solid transparent;
-    transition: color 0.15s, border-color 0.15s, background 0.15s;
     cursor: pointer;
   }
   .pi-entry:hover {
     color: var(--text);
-  }
-  .pi-entry.active {
-    color: var(--text);
-    border-left-color: var(--accent);
-    background: rgba(88, 166, 255, 0.06);
   }
   .pi-entry.pi-heading {
     font-size: 0.65rem;
@@ -561,9 +572,6 @@
     margin-top: 10px;
     color: var(--accent);
     opacity: 0.7;
-  }
-  .pi-entry.pi-heading.active {
-    opacity: 1;
   }
   @media (max-width: 1100px) {
     #para-index { display: none; }
@@ -1131,11 +1139,12 @@
 </head>
 <body>
 <nav id="para-index" aria-label="Paragraph index">
-  <div class="pi-header">
-    <span class="pi-label">index</span>
-    <button class="pi-toggle" title="Toggle index layout">expand</button>
-  </div>
   <div class="pi-inner"></div>
+  <button class="pi-gear" title="Index settings">&#9881;</button>
+  <div class="pi-menu">
+    <button data-action="toggle-mode">condense</button>
+    <button data-action="toggle-guides">guides</button>
+  </div>
 </nav>
 <article>
 <header>
@@ -2839,7 +2848,6 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   ];
 
   const inner = document.querySelector('.pi-inner');
-  const toggleBtn = document.querySelector('.pi-toggle');
   if (!inner) return;
 
   let expanded = localStorage.getItem('pi_mode') === 'expanded';
@@ -2875,31 +2883,49 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   alignTop();
 
   // Toggle expanded/condensed
+  var modeBtn = document.querySelector('[data-action="toggle-mode"]');
+  var guidesBtn = document.querySelector('[data-action="toggle-guides"]');
+  var gearBtn = document.querySelector('.pi-gear');
+  var menu = document.querySelector('.pi-menu');
+
   function applyMode() {
     if (expanded) {
       inner.classList.add('pi-expanded');
       inner.style.paddingTop = '0';
-      toggleBtn.textContent = 'condense';
+      if (modeBtn) modeBtn.textContent = 'condense';
       positionEntries();
     } else {
       inner.classList.remove('pi-expanded');
-      toggleBtn.textContent = 'expand';
-      entries.forEach(function(a) { a.style.top = ''; a.style.opacity = ''; });
+      if (modeBtn) modeBtn.textContent = 'expand';
+      entries.forEach(function(a) { a.style.top = ''; });
       inner.style.paddingTop = '';
       alignTop();
     }
   }
 
-  toggleBtn.addEventListener('click', function() {
+  // Gear menu
+  if (gearBtn) gearBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    menu.classList.toggle('open');
+  });
+  document.addEventListener('click', function() { menu.classList.remove('open'); });
+
+  if (modeBtn) modeBtn.addEventListener('click', function() {
     expanded = !expanded;
     localStorage.setItem('pi_mode', expanded ? 'expanded' : 'condensed');
     applyMode();
+    menu.classList.remove('open');
+  });
+
+  if (guidesBtn) guidesBtn.addEventListener('click', function() {
+    inner.classList.toggle('pi-debug');
+    menu.classList.remove('open');
   });
 
   // Paragraph-bounded positioning (expanded mode)
   // Each entry lives within its own paragraph's vertical region
   var ENTRY_H = 20; // approx height of one entry line
-  var TOP_PAD = 36; // viewport y where entries stick (below 24px header)
+  var TOP_PAD = 8;  // small breathing room at viewport top
 
   // Debug guide lines (top = red dashed, bottom = blue dashed)
   var guides = [];
@@ -2913,21 +2939,11 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     guides.push({ top: gt, bot: gb });
   });
 
-  // Debug toggle button
-  var debugBtn = document.createElement('button');
-  debugBtn.className = 'pi-toggle';
-  debugBtn.textContent = 'guides';
-  debugBtn.style.marginLeft = '4px';
-  debugBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    inner.classList.toggle('pi-debug');
-  });
-  document.querySelector('.pi-header').appendChild(debugBtn);
 
   function positionEntries() {
     if (!expanded) return;
     var n = entries.length;
-    var offset = inner.getBoundingClientRect().top; // 24px header offset
+    var offset = inner.getBoundingClientRect().top;
     for (var i = 0; i < n; i++) {
       var el = document.getElementById(entries[i].dataset.target);
       if (!el) continue;
@@ -2941,8 +2957,6 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       // Clamp: stick at TOP_PAD, slide off with paragraph's own bottom
       var pos = Math.min(paraBottom - ENTRY_H, Math.max(TOP_PAD, paraTop));
       entries[i].style.top = (pos - offset) + 'px';
-      // Fade when entry has slid above header
-      entries[i].style.opacity = pos < TOP_PAD - 4 ? '0' : pos < TOP_PAD + 2 ? '0.4' : '1';
       // Update debug guides
       guides[i].top.style.top = (regionTop - offset) + 'px';
       guides[i].bot.style.top = (regionBottom - offset) + 'px';
@@ -2952,14 +2966,15 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   applyMode();
 
   // Scroll tracking
-  let ticking = false;
   let activeIdx = -1;
 
-  function updateActive() {
-    const EDGE_THRESH = 20; // px below viewport top before switching
-    let bestIdx = 0;
+  function onScroll() {
+    // Update expanded entry positions synchronously (no rAF lag)
+    positionEntries();
 
-    // Active = first entry whose paragraph bottom is still below viewport top
+    // Find active entry for condensed mode scroll tracking
+    const EDGE_THRESH = 20;
+    let bestIdx = 0;
     let found = false;
     for (let i = 0; i < targets.length; i++) {
       const el = document.getElementById(targets[i]);
@@ -2970,26 +2985,14 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
         break;
       }
     }
-    // If all paragraphs are above viewport, select the last one
-    if (!found) {
-      bestIdx = targets.length - 1;
-    }
-
-    // Update expanded entry positions every frame
-    positionEntries();
-
-    if (bestIdx !== activeIdx) {
-      if (activeIdx >= 0) entries[activeIdx].classList.remove('active');
-      entries[bestIdx].classList.add('active');
-      activeIdx = bestIdx;
-    }
+    if (!found) bestIdx = targets.length - 1;
+    activeIdx = bestIdx;
 
     // Continuous interpolated scroll tracking (condensed mode)
     if (!expanded && activeIdx >= 0) {
       var container = inner;
       var containerH = container.clientHeight;
 
-      // Calculate progress within current paragraph toward next
       var curEl = document.getElementById(targets[activeIdx]);
       var nextEl = activeIdx + 1 < targets.length ? document.getElementById(targets[activeIdx + 1]) : null;
       var progress = 0;
@@ -2999,37 +3002,25 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
         var span = nextTop - curTop;
         if (span > 0) progress = Math.max(0, Math.min(1, -curTop / span));
       } else if (curEl) {
-        // Last entry: use paragraph height
         var curTop = curEl.getBoundingClientRect().top;
         progress = Math.max(0, Math.min(1, -curTop / (curEl.offsetHeight || 400)));
       }
 
-      // Interpolate target scroll between current and next entry positions
       var curEntry = entries[activeIdx];
       var nextEntry = activeIdx + 1 < entries.length ? entries[activeIdx + 1] : curEntry;
       var curOff = curEntry.offsetTop;
       var nextOff = nextEntry.offsetTop;
       var targetOff = curOff + (nextOff - curOff) * progress;
 
-      // Center the interpolated position in the sidebar
       var targetScroll = Math.max(0, Math.min(
         targetOff - containerH * 0.35,
         container.scrollHeight - containerH
       ));
-
-      // Direct assignment — frame-synced, no easing lag
       container.scrollTop = targetScroll;
     }
-    ticking = false;
   }
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      ticking = true;
-      requestAnimationFrame(updateActive);
-    }
-  }, { passive: true });
-
-  requestAnimationFrame(updateActive);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 })();
 
 // ── Flashcard Annotation System ────────────────────────────────
