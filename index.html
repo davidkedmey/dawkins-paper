@@ -118,6 +118,51 @@
     color: #0d1117;
     border-color: var(--accent);
   }
+
+  /* ── Reading Mode Toggle ── */
+  .mode-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 28px;
+  }
+  .mode-btn {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.78rem;
+    padding: 5px 14px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .mode-btn:hover {
+    background: #21262d;
+    color: var(--text);
+  }
+  .mode-btn.active {
+    background: var(--accent);
+    color: #0d1117;
+    border-color: var(--accent);
+  }
+
+  /* ── Mode Visibility Rules ── */
+  body.mode-clean .pw-stage,
+  body.mode-enhanced .pw-stage { display: none; }
+  body.mode-clean .pw-multimedia,
+  body.mode-enhanced .pw-multimedia { display: none; }
+  body.mode-clean .pw-s,
+  body.mode-enhanced .pw-s { opacity: 1; border-bottom: none; }
+
+  body.mode-multimedia .pw-text {
+    position: absolute; width: 1px; height: 1px;
+    overflow: hidden; clip: rect(0,0,0,0);
+  }
+  body.mode-multimedia .pw-stage { display: none; }
+  body.mode-multimedia .pw-multimedia { display: block; }
+
   pre {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -270,6 +315,89 @@
     max-width: 100%;
     border-radius: 4px;
   }
+
+  /* ── Multimedia Beat Layout ── */
+  .pw-multimedia { display: none; }
+  .pw-beat {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 32px;
+  }
+  .pw-beat-text {
+    flex: 1;
+    min-width: 45%;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    text-align: justify;
+    hyphens: auto;
+  }
+  .pw-beat-text strong { color: var(--heading); }
+  .pw-beat-vis {
+    flex: 0 0 auto;
+    max-width: 50%;
+  }
+  .pw-beat-canvas {
+    border-radius: 4px;
+    max-width: 100%;
+  }
+  .pw-beat.pw-beat-full {
+    flex-direction: column;
+    text-align: center;
+  }
+  .pw-beat-full .pw-beat-text {
+    text-align: center;
+  }
+  .pw-beat-full .pw-beat-vis {
+    max-width: 100%;
+  }
+  .pw-cta {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 12px;
+  }
+  .pw-cta-label {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .pw-cta a {
+    display: inline-block;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 0.85rem;
+    padding: 8px 20px;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    color: var(--accent);
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  .pw-cta a:hover {
+    background: var(--accent);
+    color: #0d1117;
+  }
+  @media (max-width: 600px) {
+    .pw-beat {
+      flex-direction: column;
+      gap: 12px;
+    }
+    .pw-beat-vis {
+      max-width: 100%;
+      width: 100%;
+    }
+    .pw-beat-canvas {
+      width: 100%;
+    }
+  }
+
   .fig-recreated .fig-row-label {
     width: 100%;
     font-size: 0.75rem;
@@ -1257,6 +1385,13 @@
   <p class="affiliation">The Department of Zoology, The University of Oxford, South Parks Road, Oxford OX1 3PS, England</p>
   <p class="publication">Artificial Life, SFI Studies in the Sciences of Complexity,<br>Ed. C. Langton, Addison-Wesley Publishing Company, 1988</p>
 </header>
+
+<div class="mode-toggle" role="tablist" aria-label="Reading mode">
+  <button class="mode-btn" data-mode="clean" role="tab">Clean</button>
+  <button class="mode-btn active" data-mode="enhanced" role="tab">Enhanced</button>
+  <button class="mode-btn" data-mode="multimedia" role="tab">Multimedia</button>
+</div>
+
 <section>
 <h2 id="sec-basic">The Basic Program</h2>
 <p id="p1">A title like "The Evolution of Evolvability" ought to be anathema to a dyed-in-the-wool, radical neo-Darwinian like me! Part of the reason it isn't, is that I really have been led to think differently as a result of creating, and using, computer models of artificial life which, on the face of it, owe more to the imagination than to real biology. The use of artificial life, not as a formal model of real life but as a generator of insight in our understanding of real life, is one that I want to illustrate in this paper. With a program called <em>Blind Watchmaker</em>, I created a world of two-dimensional artificial organisms on the computer screen.<sup>1</sup> Borrowing the word used by Desmond Morris for the animal-like shapes in his surrealistic paintings,<sup>2</sup> I called them biomorphs. My main objectives in designing <em>Blind Watchmaker</em> was to reduce to the barest minimum the extent to which I designed biomorphs. I wanted as much as possible of the biology of biomorphs to emerge. All that I would design was the conditions&mdash;ideally very simple conditions&mdash;under which they might emerge. The process of emergence was to be evolution by the Darwinian process of random mutation followed by nonrandom survival. Once a Darwinian process gets going in a world, it has an open-ended power to generate surprising consequences: us, for example. But before any Darwinian process can get going, there has to be a bare minimum group of conditions set up. These were the conditions that I had to engineer in my computer world:</p>
@@ -1299,6 +1434,45 @@
   </div>
   <canvas class="pw-canvas" width="680" height="400"></canvas>
 </div>
+
+<div class="pw-multimedia">
+
+<div class="pw-beat">
+  <div class="pw-beat-text">The first naive idea that might occur to us is to go for maximum generality. Every creature is a two-dimensional pattern on a computer screen. What if we just gave each pixel its own gene?</div>
+</div>
+
+<div class="pw-beat">
+  <div class="pw-beat-text">The Macintosh screen is a grid of tiny squares, each either on or off.</div>
+  <div class="pw-beat-vis"><canvas class="pw-beat-canvas" data-beat="2" width="280" height="200"></canvas></div>
+</div>
+
+<div class="pw-beat">
+  <div class="pw-beat-text">340 &times; 250 = <strong>85,000 pixels</strong>.</div>
+  <div class="pw-beat-vis"><canvas class="pw-beat-canvas" data-beat="3" width="280" height="200"></canvas></div>
+</div>
+
+<div class="pw-beat">
+  <div class="pw-beat-text">One gene per pixel &mdash; the genotype <em>is</em> the picture. 85,000 binary genes, each &ldquo;on&rdquo; or &ldquo;off.&rdquo;</div>
+  <div class="pw-beat-vis"><canvas class="pw-beat-canvas" data-beat="4" width="280" height="200"></canvas></div>
+</div>
+
+<div class="pw-beat">
+  <div class="pw-beat-text">One mutation = one pixel flip. Can you spot the &ldquo;improvement&rdquo;?</div>
+  <div class="pw-beat-vis"><canvas class="pw-beat-canvas" data-beat="5" width="280" height="200"></canvas></div>
+</div>
+
+<div class="pw-beat pw-beat-full">
+  <div class="pw-beat-text">In theory you could breed <em>any</em> pattern. In practice: ~10<sup>25,000</sup> generations.<br><strong>Technically possible. Practically impossible.</strong></div>
+  <div class="pw-beat-vis"><canvas class="pw-beat-canvas" data-beat="6" width="500" height="200"></canvas></div>
+</div>
+
+<div class="pw-cta">
+  <div class="pw-cta-label">Interactive</div>
+  <a href="https://biomorphbuilder.com/dawkins-biomorphs/game/" target="_blank" rel="noopener">Try the Pixel-Peppering Game &rarr;</a>
+</div>
+
+</div>
+
 </div>
 
 <p id="p9">But only in theory. In practice we'd be waiting till kingdom come. This really would be a very na&iuml;ve way of writing <code>Develop</code>, and it would produce a very boring kind of artificial life. It is a kind of zero-order embryology, the kind of embryology we must improve upon. Our improvements will take the form of constraints. Constrained embryologies are improvements over na&iuml;ve pixel-peppering, not because they have greater generality but because they have less. Na&iuml;ve pixel peppering can produce all possible pictures, including the set that anyone might regard as biological. The trouble lies in the astronomical number of nonsense patterns that it can also produce. Constrained embryologies have a restricted set of phenotypes that they can generate, and they will be specified by a smaller set of genes, each gene controlling a more powerful drawing operation than coloring a single pixel. The task is to find an embryological procedure whose phenotypes are restricted in biologically interesting directions.</p>
@@ -1654,6 +1828,38 @@
 <div id="fc-root"></div>
 
 <script>
+
+// === Reading Mode Toggle ===
+(function() {
+  var MODES = ['clean', 'enhanced', 'multimedia'];
+  var saved = localStorage.getItem('reading_mode');
+  var current = MODES.indexOf(saved) >= 0 ? saved : 'enhanced';
+
+  function setMode(mode) {
+    current = mode;
+    MODES.forEach(function(m) { document.body.classList.remove('mode-' + m); });
+    document.body.classList.add('mode-' + mode);
+    var btns = document.querySelectorAll('.mode-btn');
+    btns.forEach(function(b) {
+      b.classList.toggle('active', b.getAttribute('data-mode') === mode);
+    });
+    localStorage.setItem('reading_mode', mode);
+    if (mode === 'multimedia' && typeof initPwBeats === 'function') {
+      initPwBeats();
+    }
+  }
+
+  // Set initial mode on load
+  setMode(current);
+
+  // Bind clicks
+  document.querySelectorAll('.mode-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      setMode(btn.getAttribute('data-mode'));
+    });
+  });
+})();
+
 // ── Biomorph Renderer (extracted from biomorph.js) ─────────────
 
 const PAPER_MODE_CONFIGS = {
@@ -3280,6 +3486,322 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
 
   goToStep(0);
 })();
+
+
+// === Multimedia Beat Canvas Renderers ===
+var initPwBeats = (function() {
+  var initialized = false;
+
+  // Shared helpers (same algo as walkthrough)
+  function makeRand(s) {
+    var seed = s;
+    return function() {
+      seed = (seed * 16807) % 2147483647;
+      return seed / 2147483647;
+    };
+  }
+
+  function roundRect(c, x, y, w, h, r) {
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.lineTo(x + w - r, y);
+    c.arcTo(x + w, y, x + w, y + r, r);
+    c.lineTo(x + w, y + h - r);
+    c.arcTo(x + w, y + h, x + w - r, y + h, r);
+    c.lineTo(x + r, y + h);
+    c.arcTo(x, y + h, x, y + h - r, r);
+    c.lineTo(x, y + r);
+    c.arcTo(x, y, x + r, y, r);
+    c.closePath();
+  }
+
+  var MAC_BEIGE = '#c8b88a';
+  var MAC_DARK = '#a89868';
+  var MAC_SCREEN_BG = '#1a2a1a';
+  var WHITE = '#e6edf3';
+  var DIM = '#8b949e';
+  var ACCENT = '#58a6ff';
+
+  function drawMacFrame(ctx, x, y, w, h, label) {
+    ctx.fillStyle = MAC_BEIGE;
+    roundRect(ctx, x, y, w, h, 6);
+    ctx.fill();
+    ctx.strokeStyle = MAC_DARK;
+    ctx.lineWidth = 1;
+    roundRect(ctx, x, y, w, h, 6);
+    ctx.stroke();
+    var sx = x + 14, sy = y + 11;
+    var sw = w - 28, sh = h - 36;
+    ctx.fillStyle = MAC_SCREEN_BG;
+    roundRect(ctx, sx, sy, sw, sh, 3);
+    ctx.fill();
+    ctx.strokeStyle = '#0a1a0a';
+    ctx.lineWidth = 0.5;
+    roundRect(ctx, sx, sy, sw, sh, 3);
+    ctx.stroke();
+    if (label) {
+      ctx.fillStyle = '#6a5a3a';
+      ctx.font = '9px -apple-system, BlinkMacSystemFont, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(label, x + w / 2, y + h - 6);
+    }
+    return { x: sx, y: sy, w: sw, h: sh };
+  }
+
+  // Beat 2: Mac screen with blank display
+  function drawBeat2(canvas) {
+    var ctx = canvas.getContext('2d');
+    var cw = 280, ch = 200;
+    var screen = drawMacFrame(ctx, 60, 10, 160, 160, 'Macintosh');
+    ctx.fillStyle = '#f0f0f0';
+    ctx.fillRect(screen.x + 6, screen.y + 6, screen.w - 12, screen.h - 12);
+    ctx.fillStyle = DIM;
+    ctx.font = 'italic 11px Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Every creature is a picture here', cw / 2, 190);
+  }
+
+  // Beat 3: Pixel grid with dimension arrows
+  function drawBeat3(canvas) {
+    var ctx = canvas.getContext('2d');
+    var cw = 280, ch = 200;
+    var gx = 40, gy = 20, gw = 180, gh = 130;
+    var cols = 12, rows = 9;
+    var cellW = gw / cols, cellH = gh / rows;
+    var rand = makeRand(42);
+    for (var r = 0; r < rows; r++) {
+      for (var c = 0; c < cols; c++) {
+        if (rand() < 0.08) {
+          ctx.fillStyle = ACCENT;
+          ctx.globalAlpha = 0.25;
+          ctx.fillRect(gx + c * cellW, gy + r * cellH, cellW, cellH);
+          ctx.globalAlpha = 1;
+        }
+      }
+    }
+    ctx.strokeStyle = '#30363d';
+    ctx.lineWidth = 0.5;
+    for (var r = 0; r <= rows; r++) {
+      ctx.beginPath();
+      ctx.moveTo(gx, gy + r * cellH);
+      ctx.lineTo(gx + gw, gy + r * cellH);
+      ctx.stroke();
+    }
+    for (var c = 0; c <= cols; c++) {
+      ctx.beginPath();
+      ctx.moveTo(gx + c * cellW, gy);
+      ctx.lineTo(gx + c * cellW, gy + gh);
+      ctx.stroke();
+    }
+    // "340" arrow across top
+    ctx.strokeStyle = ACCENT;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.moveTo(gx, gy - 8); ctx.lineTo(gx + gw, gy - 8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(gx, gy - 12); ctx.lineTo(gx, gy - 4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(gx + gw, gy - 12); ctx.lineTo(gx + gw, gy - 4); ctx.stroke();
+    ctx.fillStyle = ACCENT;
+    ctx.font = 'bold 11px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('340', gx + gw / 2, gy - 14);
+    // "250" arrow down right
+    ctx.beginPath(); ctx.moveTo(gx + gw + 8, gy); ctx.lineTo(gx + gw + 8, gy + gh); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(gx + gw + 4, gy); ctx.lineTo(gx + gw + 12, gy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(gx + gw + 4, gy + gh); ctx.lineTo(gx + gw + 12, gy + gh); ctx.stroke();
+    ctx.save();
+    ctx.translate(gx + gw + 14, gy + gh / 2);
+    ctx.rotate(Math.PI / 2);
+    ctx.fillText('250', 0, 0);
+    ctx.restore();
+    // "= 85,000 pixels" below
+    ctx.fillStyle = WHITE;
+    ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('= 85,000 pixels', cw / 2, gy + gh + 28);
+  }
+
+  // Beat 4: Random noise filling Mac screen
+  function drawBeat4(canvas) {
+    var ctx = canvas.getContext('2d');
+    var cw = 280, ch = 200;
+    var screen = drawMacFrame(ctx, 60, 10, 160, 150, 'Macintosh');
+    var rand = makeRand(7777);
+    var gridSize = 28;
+    var cellW = (screen.w - 2) / gridSize;
+    var cellH = (screen.h - 2) / gridSize;
+    for (var r = 0; r < gridSize; r++) {
+      for (var c = 0; c < gridSize; c++) {
+        ctx.fillStyle = rand() < 0.5 ? '#e0e0e0' : '#1a2a1a';
+        ctx.fillRect(screen.x + 1 + c * cellW, screen.y + 1 + r * cellH, cellW, cellH);
+      }
+    }
+    ctx.fillStyle = DIM;
+    ctx.font = '9px "SF Mono", "Fira Code", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText('01001101 10110010 11100001 ...', cw / 2, 185);
+  }
+
+  // Beat 5: Parent / Offspring side by side with red-circled mutation
+  function drawBeat5(canvas) {
+    var ctx = canvas.getContext('2d');
+    var cw = 280, ch = 200;
+    var s1 = drawMacFrame(ctx, 10, 10, 115, 140, 'Parent');
+    var s2 = drawMacFrame(ctx, 155, 10, 115, 140, 'Offspring');
+    var rand1 = makeRand(999);
+    var gridSize = 16;
+    var pixels = [];
+    for (var i = 0; i < gridSize * gridSize; i++) {
+      pixels.push(rand1() < 0.5 ? 1 : 0);
+    }
+    var cellW1 = (s1.w - 2) / gridSize;
+    var cellH1 = (s1.h - 2) / gridSize;
+    for (var r = 0; r < gridSize; r++) {
+      for (var c = 0; c < gridSize; c++) {
+        ctx.fillStyle = pixels[r * gridSize + c] ? '#e0e0e0' : '#1a2a1a';
+        ctx.fillRect(s1.x + 1 + c * cellW1, s1.y + 1 + r * cellH1, cellW1, cellH1);
+      }
+    }
+    var mutIdx = 130;
+    var mutR = Math.floor(mutIdx / gridSize);
+    var mutC = mutIdx % gridSize;
+    var offspring = pixels.slice();
+    offspring[mutIdx] = 1 - offspring[mutIdx];
+    var cellW2 = (s2.w - 2) / gridSize;
+    var cellH2 = (s2.h - 2) / gridSize;
+    for (var r = 0; r < gridSize; r++) {
+      for (var c = 0; c < gridSize; c++) {
+        ctx.fillStyle = offspring[r * gridSize + c] ? '#e0e0e0' : '#1a2a1a';
+        ctx.fillRect(s2.x + 1 + c * cellW2, s2.y + 1 + r * cellH2, cellW2, cellH2);
+      }
+    }
+    // Red circle on mutation
+    ctx.strokeStyle = '#ff6b6b';
+    ctx.lineWidth = 1.5;
+    var mx = s2.x + 1 + mutC * cellW2 + cellW2 / 2;
+    var my = s2.y + 1 + mutR * cellH2 + cellH2 / 2;
+    ctx.beginPath();
+    ctx.arc(mx, my, cellW2 + 3, 0, Math.PI * 2);
+    ctx.stroke();
+    // Arrow between
+    ctx.strokeStyle = DIM;
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(130, 80); ctx.lineTo(150, 80); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(147, 77); ctx.lineTo(152, 80); ctx.lineTo(147, 83);
+    ctx.closePath();
+    ctx.fillStyle = DIM;
+    ctx.fill();
+    ctx.fillStyle = DIM;
+    ctx.font = 'italic 10px Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('One pixel flipped', cw / 2, 170);
+    ctx.fillStyle = '#ff6b6b';
+    ctx.font = 'italic 10px Georgia, serif';
+    ctx.fillText('Can you spot it?', cw / 2, 186);
+  }
+
+  // Beat 6: Noise -> T-Rex (500x200, full width)
+  function drawBeat6(canvas) {
+    var ctx = canvas.getContext('2d');
+    var cw = 500, ch = 200;
+    var dino = [
+      '0000001111100000',
+      '0000011111110000',
+      '0000011101110000',
+      '0000011111110000',
+      '0000011111000000',
+      '0100111111100000',
+      '0110111111111000',
+      '0111111111110000',
+      '1111111111100000',
+      '0011111111000000',
+      '0001111110000000',
+      '0001101110000000',
+      '0001100110000000',
+      '0001100011000000',
+      '0011000011000000',
+      '0011000001100000'
+    ];
+    var s1 = drawMacFrame(ctx, 20, 10, 160, 150, 'Starting pattern');
+    var s2 = drawMacFrame(ctx, 320, 10, 160, 150, 'Target');
+    // Random noise on left
+    var rand = makeRand(5555);
+    var gridSize = 16;
+    var cellW1 = (s1.w - 2) / gridSize;
+    var cellH1 = (s1.h - 2) / gridSize;
+    for (var r = 0; r < gridSize; r++) {
+      for (var c = 0; c < gridSize; c++) {
+        ctx.fillStyle = rand() < 0.5 ? '#e0e0e0' : '#1a2a1a';
+        ctx.fillRect(s1.x + 1 + c * cellW1, s1.y + 1 + r * cellH1, cellW1, cellH1);
+      }
+    }
+    // Dinosaur on right
+    var cellW2 = (s2.w - 2) / gridSize;
+    var cellH2 = (s2.h - 2) / gridSize;
+    for (var r = 0; r < gridSize; r++) {
+      for (var c = 0; c < gridSize; c++) {
+        ctx.fillStyle = dino[r][c] === '1' ? '#e0e0e0' : '#1a2a1a';
+        ctx.fillRect(s2.x + 1 + c * cellW2, s2.y + 1 + r * cellH2, cellW2, cellH2);
+      }
+    }
+    // Arrow between
+    ctx.strokeStyle = DIM;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(190, 85); ctx.lineTo(310, 85); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(305, 80); ctx.lineTo(315, 85); ctx.lineTo(305, 90);
+    ctx.closePath();
+    ctx.fillStyle = DIM;
+    ctx.fill();
+    // Generation count
+    ctx.fillStyle = '#ff6b6b';
+    ctx.font = 'bold 12px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('~10', 245, 72);
+    ctx.font = 'bold 8px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('25,000', 256, 65);
+    ctx.fillStyle = DIM;
+    ctx.font = '10px -apple-system, BlinkMacSystemFont, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('generations', 250, 102);
+    // Caption
+    ctx.fillStyle = '#ff6b6b';
+    ctx.font = 'italic 11px Georgia, serif';
+    ctx.fillText('This is why naive pixel-peppering fails.', cw / 2, 185);
+  }
+
+  var renderers = {
+    '2': drawBeat2,
+    '3': drawBeat3,
+    '4': drawBeat4,
+    '5': drawBeat5,
+    '6': drawBeat6
+  };
+
+  return function initPwBeats() {
+    if (initialized) return;
+    initialized = true;
+    var canvases = document.querySelectorAll('.pw-beat-canvas');
+    canvases.forEach(function(canvas) {
+      var beat = canvas.getAttribute('data-beat');
+      var dpr = window.devicePixelRatio || 1;
+      var cw = parseInt(canvas.getAttribute('width'), 10);
+      var ch = parseInt(canvas.getAttribute('height'), 10);
+      canvas.width = cw * dpr;
+      canvas.height = ch * dpr;
+      canvas.style.width = cw + 'px';
+      canvas.style.height = ch + 'px';
+      var ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      if (renderers[beat]) renderers[beat](canvas);
+    });
+  };
+})();
+
+// Auto-init beats if page loaded in multimedia mode
+if (document.body.classList.contains('mode-multimedia')) {
+  initPwBeats();
+}
 
 
 // === Paragraph Index ===
