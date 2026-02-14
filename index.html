@@ -518,6 +518,277 @@
   @media (max-width: 1100px) {
     #para-index { display: none; }
   }
+
+  /* ── Flashcard Annotation System ──────────────────────────── */
+  .fc-popup {
+    position: absolute;
+    z-index: 200;
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s;
+  }
+  .fc-popup.fc-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .fc-popup button {
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    font-family: system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .fc-popup button:hover {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  .fc-qa-editor {
+    position: absolute;
+    z-index: 200;
+    width: 320px;
+    padding: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    font-family: system-ui, sans-serif;
+    display: none;
+  }
+  .fc-qa-editor.fc-visible { display: block; }
+  .fc-qa-editor .fc-ctx {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    font-style: italic;
+    line-height: 1.4;
+    max-height: 3em;
+    overflow: hidden;
+  }
+  .fc-qa-editor input, .fc-qa-editor textarea {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 0.85rem;
+    font-family: system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 6px;
+    resize: vertical;
+  }
+  .fc-qa-editor input:focus, .fc-qa-editor textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .fc-qa-editor .fc-qa-btns {
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  .fc-qa-editor .fc-qa-btns button {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    font-family: system-ui, sans-serif;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+  }
+  .fc-qa-editor .fc-qa-btns .fc-save {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+  .fc-qa-editor .fc-qa-btns .fc-cancel {
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  .fc-fab {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 150;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    color: var(--text);
+    font-size: 0.85rem;
+    font-family: system-ui, sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .fc-fab:hover { transform: scale(1.08); }
+  .fc-fab.fc-has-cards { border-color: var(--accent); }
+  .fc-fab.fc-flash {
+    animation: fc-pulse 0.4s ease;
+  }
+  @keyframes fc-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  .fc-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 250;
+    background: rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .fc-overlay.fc-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .fc-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 360px;
+    height: 100vh;
+    z-index: 300;
+    background: var(--bg);
+    border-left: 1px solid var(--border);
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    font-family: system-ui, sans-serif;
+  }
+  .fc-drawer.fc-open { transform: translateX(0); }
+  .fc-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .fc-drawer-header h3 {
+    font-size: 1rem;
+    color: var(--heading);
+    margin: 0;
+  }
+  .fc-drawer-header button {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .fc-drawer-export {
+    display: flex;
+    gap: 6px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .fc-drawer-export button {
+    padding: 3px 8px;
+    font-size: 0.72rem;
+    font-family: system-ui, sans-serif;
+    background: var(--surface);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .fc-drawer-export button:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+  .fc-drawer-cards {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 16px;
+  }
+  .fc-drawer-empty {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: 40px;
+    line-height: 1.6;
+  }
+
+  .fc-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.15s;
+  }
+  .fc-card:hover { border-color: var(--text-dim); }
+  .fc-card-type {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+  .fc-card-front {
+    font-size: 0.85rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
+  .fc-card-back {
+    font-size: 0.85rem;
+    color: var(--accent);
+    line-height: 1.5;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+    display: none;
+  }
+  .fc-card.fc-flipped .fc-card-back { display: block; }
+  .fc-card-del {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+    padding: 2px 4px;
+  }
+  .fc-card:hover .fc-card-del { opacity: 1; }
+  .fc-card-del:hover { color: #f85149; }
+  .fc-card-para {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  @media (max-width: 600px) {
+    .fc-drawer { width: 100vw; }
+    .fc-qa-editor { width: calc(100vw - 32px); }
+    .fc-fab { width: 38px; height: 38px; font-size: 0.75rem; bottom: 16px; right: 16px; }
+  }
 </style>
 </head>
 <body>
@@ -913,6 +1184,8 @@
 </section>
 
 </article>
+
+<div id="fc-root"></div>
 
 <script>
 // ── Biomorph Renderer (extracted from biomorph.js) ─────────────
@@ -2305,6 +2578,388 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
 
   // Initial update
   requestAnimationFrame(updateActive);
+})();
+
+// ── Flashcard Annotation System ────────────────────────────────
+(function() {
+  'use strict';
+
+  const STORAGE_KEY = 'fc_dawkins_evoevolvability';
+  const EXCLUDE = '.widget-box, .widget-graduation, figure, .fc-popup, .fc-drawer, .fc-qa-editor, .fc-fab, .fc-overlay';
+  let cards = [];
+  let drawerOpen = false;
+
+  // ── Load / Save ──
+  function load() {
+    try { cards = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch { cards = []; }
+  }
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+    updateFab();
+  }
+
+  // ── DOM Creation ──
+  const root = document.getElementById('fc-root');
+
+  // Popup
+  const popup = document.createElement('div');
+  popup.className = 'fc-popup';
+  popup.innerHTML = '<button data-fc="cloze">Cloze</button><button data-fc="qa">Q</button>';
+  document.body.appendChild(popup);
+
+  // QA Editor
+  const editor = document.createElement('div');
+  editor.className = 'fc-qa-editor';
+  editor.innerHTML =
+    '<div class="fc-ctx"></div>' +
+    '<input type="text" class="fc-q-input" placeholder="Question...">' +
+    '<textarea class="fc-a-input" rows="2" placeholder="Answer (optional)"></textarea>' +
+    '<div class="fc-qa-btns"><button class="fc-cancel">Cancel</button><button class="fc-save">Save</button></div>';
+  document.body.appendChild(editor);
+
+  // FAB
+  const fab = document.createElement('button');
+  fab.className = 'fc-fab';
+  fab.title = 'Flashcards';
+  fab.textContent = '0';
+  document.body.appendChild(fab);
+
+  // Overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'fc-overlay';
+  document.body.appendChild(overlay);
+
+  // Drawer
+  const drawer = document.createElement('div');
+  drawer.className = 'fc-drawer';
+  drawer.innerHTML =
+    '<div class="fc-drawer-header"><h3>Flashcards</h3><button class="fc-close">\u00d7</button></div>' +
+    '<div class="fc-drawer-export">' +
+      '<button data-fmt="md">Markdown</button>' +
+      '<button data-fmt="csv">CSV</button>' +
+      '<button data-fmt="json">JSON</button>' +
+    '</div>' +
+    '<div class="fc-drawer-cards"></div>';
+  document.body.appendChild(drawer);
+
+  const cardContainer = drawer.querySelector('.fc-drawer-cards');
+
+  // ── Selection state ──
+  let selText = '';
+  let selRange = null;
+  let selParagraph = null;
+
+  function hidePopup() { popup.classList.remove('fc-visible'); }
+  function hideEditor() { editor.classList.remove('fc-visible'); }
+
+  // ── Selection detection ──
+  document.addEventListener('mouseup', function(e) {
+    if (e.target.closest(EXCLUDE)) return;
+
+    setTimeout(function() {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !sel.rangeCount) { hidePopup(); return; }
+
+      const text = sel.toString().trim();
+      if (!text || text.length < 2) { hidePopup(); return; }
+
+      // Walk up to find <p id="pN">
+      let node = sel.anchorNode;
+      let para = null;
+      while (node && node !== document.body) {
+        if (node.nodeType === 1 && node.tagName === 'P' && node.id && /^p\d+$/.test(node.id)) {
+          para = node;
+          break;
+        }
+        node = node.parentNode;
+      }
+      if (!para) { hidePopup(); return; }
+
+      // Check focusNode is in same paragraph
+      let fNode = sel.focusNode;
+      let fPara = null;
+      while (fNode && fNode !== document.body) {
+        if (fNode.nodeType === 1 && fNode.tagName === 'P' && fNode.id && /^p\d+$/.test(fNode.id)) {
+          fPara = fNode;
+          break;
+        }
+        fNode = fNode.parentNode;
+      }
+      if (fPara !== para) { hidePopup(); return; }
+
+      selText = text;
+      selRange = sel.getRangeAt(0);
+      selParagraph = para;
+
+      // Position popup
+      const rect = selRange.getBoundingClientRect();
+      const pw = popup.offsetWidth || 120;
+      let left = rect.left + (rect.width / 2) - (pw / 2) + window.scrollX;
+      let top = rect.top - 40 + window.scrollY;
+
+      // Flip below if no room above
+      if (rect.top < 50) {
+        top = rect.bottom + 8 + window.scrollY;
+      }
+      // Clamp horizontal
+      left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+
+      popup.style.left = left + 'px';
+      popup.style.top = top + 'px';
+      popup.classList.add('fc-visible');
+    }, 10);
+  });
+
+  // Hide popup on scroll or click outside
+  document.addEventListener('mousedown', function(e) {
+    if (!e.target.closest('.fc-popup')) hidePopup();
+    if (!e.target.closest('.fc-qa-editor') && !e.target.closest('.fc-popup')) hideEditor();
+  });
+
+  // ── Sentence extraction ──
+  function extractSentence(paraText, selected) {
+    const idx = paraText.indexOf(selected);
+    if (idx === -1) return { sentence: selected, front: '___' };
+
+    // Walk backward to sentence boundary
+    let start = idx;
+    while (start > 0) {
+      const ch = paraText[start - 1];
+      if ((ch === '.' || ch === '!' || ch === '?') && start < idx) {
+        // Check if followed by space or is the position
+        if (start < paraText.length && /\s/.test(paraText[start])) break;
+      }
+      start--;
+    }
+
+    // Walk forward to sentence boundary
+    let end = idx + selected.length;
+    while (end < paraText.length) {
+      const ch = paraText[end];
+      if (ch === '.' || ch === '!' || ch === '?') { end++; break; }
+      end++;
+    }
+
+    const sentence = paraText.slice(start, end).trim();
+    const front = sentence.replace(selected, '___');
+    return { sentence: sentence, front: front };
+  }
+
+  // ── Flash FAB ──
+  function flashFab() {
+    fab.classList.remove('fc-flash');
+    void fab.offsetWidth; // reflow
+    fab.classList.add('fc-flash');
+  }
+
+  // ── Popup button handlers ──
+  popup.addEventListener('click', function(e) {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+
+    const action = btn.dataset.fc;
+    hidePopup();
+
+    if (action === 'cloze') {
+      const paraText = selParagraph.textContent;
+      const result = extractSentence(paraText, selText);
+      const card = {
+        id: 'c_' + Date.now(),
+        type: 'cloze',
+        paragraphId: selParagraph.id,
+        anchor: selText.slice(0, 50),
+        front: result.front,
+        back: selText,
+        created: Date.now()
+      };
+      cards.push(card);
+      save();
+      flashFab();
+      window.getSelection().removeAllRanges();
+    }
+
+    if (action === 'qa') {
+      // Show editor near selection
+      const rect = selRange.getBoundingClientRect();
+      let left = rect.left + window.scrollX;
+      let top = rect.bottom + 8 + window.scrollY;
+
+      // Clamp
+      const ew = 320;
+      left = Math.max(8, Math.min(left, window.innerWidth - ew - 8));
+
+      editor.style.left = left + 'px';
+      editor.style.top = top + 'px';
+      editor.querySelector('.fc-ctx').textContent = '"' + selText.slice(0, 80) + (selText.length > 80 ? '...' : '') + '"';
+      editor.querySelector('.fc-q-input').value = '';
+      editor.querySelector('.fc-a-input').value = '';
+      editor.classList.add('fc-visible');
+      setTimeout(function() { editor.querySelector('.fc-q-input').focus(); }, 50);
+    }
+  });
+
+  // ── QA Editor save/cancel ──
+  editor.querySelector('.fc-save').addEventListener('click', function() {
+    const q = editor.querySelector('.fc-q-input').value.trim();
+    if (!q) { editor.querySelector('.fc-q-input').focus(); return; }
+    const a = editor.querySelector('.fc-a-input').value.trim();
+
+    const card = {
+      id: 'qa_' + Date.now(),
+      type: 'qa',
+      paragraphId: selParagraph ? selParagraph.id : '',
+      anchor: selText.slice(0, 50),
+      front: q,
+      back: a || selText,
+      created: Date.now()
+    };
+    cards.push(card);
+    save();
+    hideEditor();
+    flashFab();
+    window.getSelection().removeAllRanges();
+  });
+
+  editor.querySelector('.fc-cancel').addEventListener('click', hideEditor);
+
+  // Save on Enter in question field
+  editor.querySelector('.fc-q-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      editor.querySelector('.fc-save').click();
+    }
+  });
+
+  // ── FAB ──
+  function updateFab() {
+    fab.textContent = cards.length;
+    fab.classList.toggle('fc-has-cards', cards.length > 0);
+  }
+
+  fab.addEventListener('click', function() {
+    openDrawer();
+  });
+
+  // ── Drawer ──
+  function openDrawer() {
+    renderCards();
+    drawer.classList.add('fc-open');
+    overlay.classList.add('fc-visible');
+    drawerOpen = true;
+  }
+
+  function closeDrawer() {
+    drawer.classList.remove('fc-open');
+    overlay.classList.remove('fc-visible');
+    drawerOpen = false;
+  }
+
+  drawer.querySelector('.fc-close').addEventListener('click', closeDrawer);
+  overlay.addEventListener('click', closeDrawer);
+
+  function renderCards() {
+    if (cards.length === 0) {
+      cardContainer.innerHTML = '<div class="fc-drawer-empty">No flashcards yet.<br>Select text in any paragraph to create one.</div>';
+      return;
+    }
+    cardContainer.innerHTML = '';
+    // Show newest first
+    for (let i = cards.length - 1; i >= 0; i--) {
+      const c = cards[i];
+      const el = document.createElement('div');
+      el.className = 'fc-card';
+      el.dataset.idx = i;
+      el.innerHTML =
+        '<div class="fc-card-type">' + (c.type === 'cloze' ? 'Cloze' : 'Q&A') + '</div>' +
+        '<div class="fc-card-front">' + escHtml(c.front) + '</div>' +
+        '<div class="fc-card-back">' + escHtml(c.back) + '</div>' +
+        '<button class="fc-card-del" title="Delete">\u00d7</button>' +
+        '<div class="fc-card-para">\u00b6 ' + c.paragraphId + '</div>';
+      cardContainer.appendChild(el);
+    }
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // Card flip and delete
+  cardContainer.addEventListener('click', function(e) {
+    const del = e.target.closest('.fc-card-del');
+    if (del) {
+      const card = del.closest('.fc-card');
+      const idx = parseInt(card.dataset.idx, 10);
+      cards.splice(idx, 1);
+      save();
+      renderCards();
+      return;
+    }
+    const card = e.target.closest('.fc-card');
+    if (card) card.classList.toggle('fc-flipped');
+  });
+
+  // ── Export ──
+  drawer.querySelector('.fc-drawer-export').addEventListener('click', function(e) {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    const fmt = btn.dataset.fmt;
+
+    if (fmt === 'md') exportMarkdown();
+    if (fmt === 'csv') exportCSV();
+    if (fmt === 'json') exportJSON();
+  });
+
+  function downloadBlob(content, filename, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function exportMarkdown() {
+    let md = '';
+    cards.forEach(function(c) {
+      if (c.type === 'cloze') {
+        md += c.front.replace('___', '==' + c.back + '==') + '\n<!--SR:' + c.paragraphId + '-->\n\n';
+      } else {
+        md += c.front + '\n?\n' + c.back + '\n<!--SR:' + c.paragraphId + '-->\n\n';
+      }
+    });
+    downloadBlob(md.trim(), 'dawkins-flashcards.md', 'text/markdown');
+  }
+
+  function exportCSV() {
+    let csv = 'front\tback\ttags\n';
+    cards.forEach(function(c) {
+      const front = c.type === 'cloze' ? c.front.replace('___', '{{c1::' + c.back + '}}') : c.front;
+      const back = c.type === 'cloze' ? '' : c.back;
+      csv += '"' + front.replace(/"/g, '""') + '"\t"' + back.replace(/"/g, '""') + '"\tdawkins::' + c.paragraphId + '\n';
+    });
+    downloadBlob(csv, 'dawkins-flashcards.txt', 'text/tab-separated-values');
+  }
+
+  function exportJSON() {
+    downloadBlob(JSON.stringify(cards, null, 2), 'dawkins-flashcards.json', 'application/json');
+  }
+
+  // ── Keyboard: Escape closes drawer/editor ──
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (drawerOpen) closeDrawer();
+      hideEditor();
+      hidePopup();
+    }
+  });
+
+  // ── Init ──
+  load();
+  updateFab();
 })();
 </script>
 </body>
