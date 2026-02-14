@@ -472,7 +472,8 @@
   }
   .pi-toggle {
     position: absolute;
-    right: 12px;
+    top: 8px;
+    right: 8px;
     z-index: 101;
     background: var(--bg);
     border: 1px solid var(--border);
@@ -499,7 +500,7 @@
   }
   .pi-inner::-webkit-scrollbar { display: none; }
   /* Expanded mode: entries positioned at paragraph offsets */
-  .pi-inner.pi-expanded { overflow: visible; }
+  .pi-inner.pi-expanded { overflow: hidden; }
   .pi-inner.pi-expanded .pi-entry {
     position: absolute;
     left: 0;
@@ -507,6 +508,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    transition: none;
   }
   .pi-entry {
     display: block;
@@ -2835,13 +2837,12 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     targets.push(item.id);
   });
 
-  // Align top of index with p1
+  // Align top of index with p1 (condensed mode)
   function alignTop() {
     var p1 = document.getElementById('p1');
     if (!p1) return;
     var p1Top = p1.getBoundingClientRect().top + window.scrollY;
     inner.style.paddingTop = p1Top + 'px';
-    toggleBtn.style.top = (p1Top - 20) + 'px';
   }
   alignTop();
 
@@ -2849,15 +2850,14 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   function applyMode() {
     if (expanded) {
       inner.classList.add('pi-expanded');
+      inner.style.paddingTop = '0';
       toggleBtn.textContent = 'condense';
-      toggleBtn.style.top = '';
-      toggleBtn.style.bottom = '12px';
       positionEntries();
     } else {
       inner.classList.remove('pi-expanded');
       toggleBtn.textContent = 'expand';
       entries.forEach(function(a) { a.style.top = ''; });
-      toggleBtn.style.bottom = '';
+      inner.style.paddingTop = '';
       alignTop();
     }
   }
@@ -2868,16 +2868,33 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     applyMode();
   });
 
-  // Position entries next to their paragraphs (expanded mode)
-  // Uses viewport-relative coords since sidebar is position:fixed
+  // Sticky-summary positioning (expanded mode)
+  // Each entry sticks at top of sidebar; next entry pushes it off
+  var ENTRY_H = 20; // approx height of one entry line
+  var ENTRY_GAP = 1;
+
   function positionEntries() {
     if (!expanded) return;
-    entries.forEach(function(a) {
-      var id = a.dataset.target;
-      var el = document.getElementById(id);
-      if (!el) return;
-      a.style.top = el.getBoundingClientRect().top + 'px';
-    });
+    var n = entries.length;
+    // First pass: get natural positions (paragraph tops in viewport coords)
+    var natural = [];
+    for (var i = 0; i < n; i++) {
+      var el = document.getElementById(entries[i].dataset.target);
+      natural[i] = el ? el.getBoundingClientRect().top : 99999;
+    }
+    // Second pass: bottom-up. Each entry sticks at top (max 0) but gets
+    // pushed off-screen (negative) by the entry below it.
+    var tops = new Array(n);
+    var maxTop = Infinity;
+    for (var i = n - 1; i >= 0; i--) {
+      var sticky = Math.max(0, natural[i]); // stick at viewport top
+      var pushed = Math.min(sticky, maxTop - ENTRY_H); // pushed up by entry below
+      tops[i] = pushed;
+      maxTop = pushed - ENTRY_GAP;
+    }
+    for (var i = 0; i < n; i++) {
+      entries[i].style.top = tops[i] + 'px';
+    }
   }
 
   applyMode();
