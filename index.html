@@ -2931,13 +2931,14 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       var el = document.getElementById(entries[i].dataset.target);
       if (!el) continue;
       var paraTop = el.getBoundingClientRect().top;
-      // Region = full territory: previous paragraph's bottom to next paragraph's top
+      var paraBottom = el.getBoundingClientRect().bottom;
+      // Region = full territory (for debug guides only)
       var prevEl = i > 0 ? document.getElementById(entries[i - 1].dataset.target) : null;
       var nextEl = i + 1 < n ? document.getElementById(entries[i + 1].dataset.target) : null;
       var regionTop = prevEl ? prevEl.getBoundingClientRect().bottom : paraTop;
-      var regionBottom = nextEl ? nextEl.getBoundingClientRect().top : el.getBoundingClientRect().bottom;
-      // Clamp: stick at TOP_PAD, but pushed off when next paragraph approaches
-      var pos = Math.min(regionBottom - ENTRY_H, Math.max(TOP_PAD, paraTop));
+      var regionBottom = nextEl ? nextEl.getBoundingClientRect().top : paraBottom;
+      // Clamp: stick at TOP_PAD, slide off with paragraph's own bottom
+      var pos = Math.min(paraBottom - ENTRY_H, Math.max(TOP_PAD, paraTop));
       entries[i].style.top = pos + 'px';
       // Fade when entry has slid above header
       entries[i].style.opacity = pos < TOP_PAD - 4 ? '0' : pos < TOP_PAD + 2 ? '0.4' : '1';
