@@ -578,6 +578,18 @@
     font-size: 0.5rem;
     margin-left: 4px;
   }
+  .pi-bracket {
+    position: absolute;
+    right: -4px;
+    width: 8px;
+    border-right: 1px solid rgba(255, 255, 255, 0.13);
+    border-top: 1px solid rgba(255, 255, 255, 0.13);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 0 3px 3px 0;
+    pointer-events: none;
+    display: none;
+  }
+  .pi-expanded ~ .pi-bracket { display: block; }
   .pi-entry.pi-heading {
     font-size: 0.65rem;
     font-weight: 700;
@@ -2968,6 +2980,17 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     guides.push({ top: gt, bot: gb });
   });
 
+  // Paragraph brackets (in #para-index, not .pi-inner, to avoid overflow clip)
+  var nav = document.getElementById('para-index');
+  var brackets = [];
+  PARA_INDEX.forEach(function(item) {
+    if (item.heading) { brackets.push(null); return; }
+    var b = document.createElement('div');
+    b.className = 'pi-bracket';
+    nav.appendChild(b);
+    brackets.push(b);
+  });
+
 
   function positionEntries() {
     if (!expanded) return;
@@ -2989,6 +3012,11 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       // Update debug guides
       guides[i].top.style.top = (regionTop - offset) + 'px';
       guides[i].bot.style.top = (regionBottom - offset) + 'px';
+      // Update bracket (viewport coords, since brackets are in #para-index fixed at top:0)
+      if (brackets[i]) {
+        brackets[i].style.top = paraTop + 'px';
+        brackets[i].style.height = (paraBottom - paraTop) + 'px';
+      }
     }
   }
 
