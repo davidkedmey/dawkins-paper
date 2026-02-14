@@ -459,9 +459,71 @@
     }
   }
 
+
+  /* Paragraph index sidebar */
+  #para-index {
+    position: fixed;
+    top: 0;
+    left: calc(50vw - 360px - 204px);
+    width: 180px;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .pi-inner {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    overflow-y: auto;
+    pointer-events: auto;
+    padding: 48px 12px 80px 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .pi-inner::-webkit-scrollbar { display: none; }
+  .pi-entry {
+    display: block;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 0.7rem;
+    line-height: 1.35;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 2px 8px;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    cursor: pointer;
+  }
+  .pi-entry:hover {
+    color: var(--text);
+  }
+  .pi-entry.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(88, 166, 255, 0.06);
+  }
+  .pi-entry.pi-heading {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 10px;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+  .pi-entry.pi-heading.active {
+    opacity: 1;
+  }
+  @media (max-width: 1100px) {
+    #para-index { display: none; }
+  }
 </style>
 </head>
 <body>
+<nav id="para-index" aria-label="Paragraph index">
+  <div class="pi-inner"></div>
+</nav>
 <article>
 <header>
   <h1>The Evolution of Evolvability</h1>
@@ -470,19 +532,19 @@
   <p class="publication">Artificial Life, SFI Studies in the Sciences of Complexity,<br>Ed. C. Langton, Addison-Wesley Publishing Company, 1988</p>
 </header>
 <section>
-<p>A title like "The Evolution of Evolvability" ought to be anathema to a dyed-in-the-wool, radical neo-Darwinian like me! Part of the reason it isn't, is that I really have been led to think differently as a result of creating, and using, computer models of artificial life which, on the face of it, owe more to the imagination than to real biology. The use of artificial life, not as a formal model of real life but as a generator of insight in our understanding of real life, is one that I want to illustrate in this paper. With a program called <em>Blind Watchmaker</em>, I created a world of two-dimensional artificial organisms on the computer screen.<sup>1</sup> Borrowing the word used by Desmond Morris for the animal-like shapes in his surrealistic paintings,<sup>2</sup> I called them biomorphs. My main objectives in designing <em>Blind Watchmaker</em> was to reduce to the barest minimum the extent to which I designed biomorphs. I wanted as much as possible of the biology of biomorphs to emerge. All that I would design was the conditions&mdash;ideally very simple conditions&mdash;under which they might emerge. The process of emergence was to be evolution by the Darwinian process of random mutation followed by nonrandom survival. Once a Darwinian process gets going in a world, it has an open-ended power to generate surprising consequences: us, for example. But before any Darwinian process can get going, there has to be a bare minimum group of conditions set up. These were the conditions that I had to engineer in my computer world:</p>
+<p id="p1">A title like "The Evolution of Evolvability" ought to be anathema to a dyed-in-the-wool, radical neo-Darwinian like me! Part of the reason it isn't, is that I really have been led to think differently as a result of creating, and using, computer models of artificial life which, on the face of it, owe more to the imagination than to real biology. The use of artificial life, not as a formal model of real life but as a generator of insight in our understanding of real life, is one that I want to illustrate in this paper. With a program called <em>Blind Watchmaker</em>, I created a world of two-dimensional artificial organisms on the computer screen.<sup>1</sup> Borrowing the word used by Desmond Morris for the animal-like shapes in his surrealistic paintings,<sup>2</sup> I called them biomorphs. My main objectives in designing <em>Blind Watchmaker</em> was to reduce to the barest minimum the extent to which I designed biomorphs. I wanted as much as possible of the biology of biomorphs to emerge. All that I would design was the conditions&mdash;ideally very simple conditions&mdash;under which they might emerge. The process of emergence was to be evolution by the Darwinian process of random mutation followed by nonrandom survival. Once a Darwinian process gets going in a world, it has an open-ended power to generate surprising consequences: us, for example. But before any Darwinian process can get going, there has to be a bare minimum group of conditions set up. These were the conditions that I had to engineer in my computer world:</p>
 </section>
 <section>
 <span class="page-num">p. 202</span>
-<p>The first condition, one that I have emphasized sufficiently before,<sup>1,3</sup> is that there must be replicators&mdash;entities capable, like DNA molecules, of self-replication. The second condition is our main concern in this paper. It is that there must be an embryology: the genes must influence the development of a phenotype, and the replicators must be able to exert some phenotypic power over the world, such that some of them are more successful at replicating themselves than others. The type of embryology that we choose for our artificial life is crucial. This is another way of stating the key message of this paper.</p>
+<p id="p2">The first condition, one that I have emphasized sufficiently before,<sup>1,3</sup> is that there must be replicators&mdash;entities capable, like DNA molecules, of self-replication. The second condition is our main concern in this paper. It is that there must be an embryology: the genes must influence the development of a phenotype, and the replicators must be able to exert some phenotypic power over the world, such that some of them are more successful at replicating themselves than others. The type of embryology that we choose for our artificial life is crucial. This is another way of stating the key message of this paper.</p>
 
-<p>The fundamental principle of embryology in real life (and one that I decided was worth imitating in artificial life) was formulated by Weismann.<sup>4</sup> It is illustrated in Figure 1, which covers a period of two generations preceded and followed by an indefinite number of others. The important part of it is on the left, in anticipation of my explanation of how the <em>Blind Watchmaker</em> program closely follows Weismann's principle.</p>
+<p id="p3">The fundamental principle of embryology in real life (and one that I decided was worth imitating in artificial life) was formulated by Weismann.<sup>4</sup> It is illustrated in Figure 1, which covers a period of two generations preceded and followed by an indefinite number of others. The important part of it is on the left, in anticipation of my explanation of how the <em>Blind Watchmaker</em> program closely follows Weismann's principle.</p>
 
-<p>The key point is that, in every generation, it is only genes that are handed on to the next generation (down arrows to the left of Figure 1 in the sense in which this is not strictly true). In every generation, the genes of that generation influence the phenotype of that generation. The <em>nature</em> of that phenotypic determination&mdash;whether or not the genes that it bears, a set that largely overlaps with the genes that influenced its development, shall go forward to the next generation. (In <em>The Extended Phenotype</em>,<sup>3</sup> I explore the far-reaching consequences of the fact that these two sets do not necessarily have to overlap.) Any individual born, therefore, inherits genes that have succeeded in building a long series of successful phenotypes, for the simple reason that failed phenotypes don't pass on their genes. This is natural selection. It is why organisms are well adapted, and it is why we are all here.</p>
+<p id="p4">The key point is that, in every generation, it is only genes that are handed on to the next generation (down arrows to the left of Figure 1 in the sense in which this is not strictly true). In every generation, the genes of that generation influence the phenotype of that generation. The <em>nature</em> of that phenotypic determination&mdash;whether or not the genes that it bears, a set that largely overlaps with the genes that influenced its development, shall go forward to the next generation. (In <em>The Extended Phenotype</em>,<sup>3</sup> I explore the far-reaching consequences of the fact that these two sets do not necessarily have to overlap.) Any individual born, therefore, inherits genes that have succeeded in building a long series of successful phenotypes, for the simple reason that failed phenotypes don't pass on their genes. This is natural selection. It is why organisms are well adapted, and it is why we are all here.</p>
 
-<p>It is important to understand that genes do two quite distinct things. They participate in embryology, influencing the development of the phenotype in a given generation. And they participate in genetics, getting themselves copied down the generations. It is too often not realized&mdash;even by some of those that wear the labels geneticist or embryologist&mdash;that there is a radical separation between the disciplines of genetics and embryology. Genetics is the study of the vertical arrows in Figure 1, the study of the relationships between genotypes in successive generations. Embryology is the study of the horizontal arrows, the study of the relationship between genotype and phenotype in any one generation. If you doubt that the separation between the two disciplines is fundamental, consider the matter methodologically. You could do perfectly respectable embryology on a single individual. Genetics on a single individual would be meaningless. Conversely, you could do perfectly respectable genetics, but not embryology, on a population of individuals, each one sampled at only one point in its life cycle.</p>
+<p id="p5">It is important to understand that genes do two quite distinct things. They participate in embryology, influencing the development of the phenotype in a given generation. And they participate in genetics, getting themselves copied down the generations. It is too often not realized&mdash;even by some of those that wear the labels geneticist or embryologist&mdash;that there is a radical separation between the disciplines of genetics and embryology. Genetics is the study of the vertical arrows in Figure 1, the study of the relationships between genotypes in successive generations. Embryology is the study of the horizontal arrows, the study of the relationship between genotype and phenotype in any one generation. If you doubt that the separation between the two disciplines is fundamental, consider the matter methodologically. You could do perfectly respectable embryology on a single individual. Genetics on a single individual would be meaningless. Conversely, you could do perfectly respectable genetics, but not embryology, on a population of individuals, each one sampled at only one point in its life cycle.</p>
 
-<p>I resolved to maintain the separation between genetics and embryology in my artificial life. To this end, I wrote the program around two strictly separate procedures called <code>Reproduce</code> and <code>Develop</code> (Figure 1). Another part of the program presented an array of phenotypes for selection, each one drawn by the procedure <code>Develop</code> under the influence of genes that would be held responsible for its success or failure. In any generation the phenotype the chooser chose (by some criterion) as successful would be the one whose genotype went forward via <code>Reproduce</code> (with some possibility of random mutation) to the next generation. The selection criterion itself I was content to leave, for the moment, to the aesthetic taste of a human chooser. The model would therefore be, at least in the first implementation, a model of artificial selection (like breeding cattle for milk yield) not natural selection. As a didactic technique this has an honorable history: Charles Darwin made persuasive use of artificial selection as a metaphor for natural selection.</p>
+<p id="p6">I resolved to maintain the separation between genetics and embryology in my artificial life. To this end, I wrote the program around two strictly separate procedures called <code>Reproduce</code> and <code>Develop</code> (Figure 1). Another part of the program presented an array of phenotypes for selection, each one drawn by the procedure <code>Develop</code> under the influence of genes that would be held responsible for its success or failure. In any generation the phenotype the chooser chose (by some criterion) as successful would be the one whose genotype went forward via <code>Reproduce</code> (with some possibility of random mutation) to the next generation. The selection criterion itself I was content to leave, for the moment, to the aesthetic taste of a human chooser. The model would therefore be, at least in the first implementation, a model of artificial selection (like breeding cattle for milk yield) not natural selection. As a didactic technique this has an honorable history: Charles Darwin made persuasive use of artificial selection as a metaphor for natural selection.</p>
 
 <figure data-figure="1" data-figure-type="diagram">
   <div class="fig-toggle-wrap">
@@ -498,15 +560,15 @@
 </section>
 <section>
 <span class="page-num">p. 204</span>
-<p>Now to flesh out the bare bones of Figure 1. We must write some code in the two procedures, to specify the details of genetics and embryology respectively. Genetics is straightforward. However we choose to represent genes, it is obviously easy to copy them from parent to child, and it is obviously easy to introduce some random errors or mutations in the copying to represent mutation. It is embryology that we have to think about more carefully. What shall we write between the curly brackets in the procedure <code>Develop</code>, to specify the relationship between genotype and phenotype?</p>
+<p id="p7">Now to flesh out the bare bones of Figure 1. We must write some code in the two procedures, to specify the details of genetics and embryology respectively. Genetics is straightforward. However we choose to represent genes, it is obviously easy to copy them from parent to child, and it is obviously easy to introduce some random errors or mutations in the copying to represent mutation. It is embryology that we have to think about more carefully. What shall we write between the curly brackets in the procedure <code>Develop</code>, to specify the relationship between genotype and phenotype?</p>
 
-<p>The first naive idea that might occur to us is to go for maximum generality. We know that the phenotypes in our artificial world are all going to be two-dimensional patterns on a Macintosh screen. The Macintosh screen is an array of 340 &times; 250 = 85,000 pixels. If we give our biomorphs genotypes of 85,000 genes, each having a value of 1 or 0, we know that any conceivable phenotype in our artificial world can be represented by a specific genotype. Moreover, any pixel can mutate to its opposite state, and the resulting mutant might be selected, or not, in preference to its parent. It follows, therefore, that we in theory could "breed" any pattern from a random starting pattern (Figure 2a) via indirect, from any other pattern, getting from, say, Winston Churchill to a Brontosaurus, by scanning every generation hopefully for slight resemblances to the target picture.</p>
+<p id="p8">The first naive idea that might occur to us is to go for maximum generality. We know that the phenotypes in our artificial world are all going to be two-dimensional patterns on a Macintosh screen. The Macintosh screen is an array of 340 &times; 250 = 85,000 pixels. If we give our biomorphs genotypes of 85,000 genes, each having a value of 1 or 0, we know that any conceivable phenotype in our artificial world can be represented by a specific genotype. Moreover, any pixel can mutate to its opposite state, and the resulting mutant might be selected, or not, in preference to its parent. It follows, therefore, that we in theory could "breed" any pattern from a random starting pattern (Figure 2a) via indirect, from any other pattern, getting from, say, Winston Churchill to a Brontosaurus, by scanning every generation hopefully for slight resemblances to the target picture.</p>
 
-<p>But only in theory. In practice we'd be waiting till kingdom come. This really would be a very na&iuml;ve way of writing <code>Develop</code>, and it would produce a very boring kind of artificial life. It is a kind of zero-order embryology, the kind of embryology we must improve upon. Our improvements will take the form of constraints. Constrained embryologies are improvements over na&iuml;ve pixel-peppering, not because they have greater generality but because they have less. Na&iuml;ve pixel peppering can produce all possible pictures, including the set that anyone might regard as biological. The trouble lies in the astronomical number of nonsense patterns that it can also produce. Constrained embryologies have a restricted set of phenotypes that they can generate, and they will be specified by a smaller set of genes, each gene controlling a more powerful drawing operation than coloring a single pixel. The task is to find an embryological procedure whose phenotypes are restricted in biologically interesting directions.</p>
+<p id="p9">But only in theory. In practice we'd be waiting till kingdom come. This really would be a very na&iuml;ve way of writing <code>Develop</code>, and it would produce a very boring kind of artificial life. It is a kind of zero-order embryology, the kind of embryology we must improve upon. Our improvements will take the form of constraints. Constrained embryologies are improvements over na&iuml;ve pixel-peppering, not because they have greater generality but because they have less. Na&iuml;ve pixel peppering can produce all possible pictures, including the set that anyone might regard as biological. The trouble lies in the astronomical number of nonsense patterns that it can also produce. Constrained embryologies have a restricted set of phenotypes that they can generate, and they will be specified by a smaller set of genes, each gene controlling a more powerful drawing operation than coloring a single pixel. The task is to find an embryological procedure whose phenotypes are restricted in biologically interesting directions.</p>
 
-<p>So, what kinds of constrained embryologies might we think of, as improvements over na&iuml;ve pixel peppering? A slight improvement would be gained if, instead of drawing random pixels, we drew random lines (Figure 2b). Pixels, in other words, tend to pop up next to one another rather than just anywhere. We might further specify pixel-peppering by requiring it to recognise mathematical formulas&mdash;straight lines whose length and angle is specified by genes; curves whose shape is specified by a polynomial formula whose coefficients are specified by genes (Figure 2c). Yet another constraint might be one of symmetry. Most animals are, as a matter of fact, bilaterally symmetrical, though some also show various kinds of radial symmetry, and many depart from their basic symmetry in minor respects. We could use mirror algorithms in writing <code>Develop</code> (Figure 2d), giving bilateral symmetry or the presence or absence of mirrors in various planes of symmetry (Figure 2e).</p>
+<p id="p10">So, what kinds of constrained embryologies might we think of, as improvements over na&iuml;ve pixel peppering? A slight improvement would be gained if, instead of drawing random pixels, we drew random lines (Figure 2b). Pixels, in other words, tend to pop up next to one another rather than just anywhere. We might further specify pixel-peppering by requiring it to recognise mathematical formulas&mdash;straight lines whose length and angle is specified by genes; curves whose shape is specified by a polynomial formula whose coefficients are specified by genes (Figure 2c). Yet another constraint might be one of symmetry. Most animals are, as a matter of fact, bilaterally symmetrical, though some also show various kinds of radial symmetry, and many depart from their basic symmetry in minor respects. We could use mirror algorithms in writing <code>Develop</code> (Figure 2d), giving bilateral symmetry or the presence or absence of mirrors in various planes of symmetry (Figure 2e).</p>
 
-<p>But though all these embryologies are definite improvements over na&iuml;ve pixel peppering, I did not tarry long over them. Right from the start of this enterprise, I had a strong intuitive conviction about the kind of embryology I wanted. I wished for recursion. My intuition was based partly upon the generality of power that recursive algorithms are known to computer scientists, and partly upon the fact that the details of embryology in real life can to a large extent be thought of in terms of recursion.</p>
+<p id="p11">But though all these embryologies are definite improvements over na&iuml;ve pixel peppering, I did not tarry long over them. Right from the start of this enterprise, I had a strong intuitive conviction about the kind of embryology I wanted. I wished for recursion. My intuition was based partly upon the generality of power that recursive algorithms are known to computer scientists, and partly upon the fact that the details of embryology in real life can to a large extent be thought of in terms of recursion.</p>
 
 <figure data-figure="2" data-figure-type="peppering-progression">
   <div class="fig-toggle-wrap">
@@ -520,7 +582,7 @@
   <figcaption><strong>FIGURE 2</strong>&ensp;Breeding from a random starting point (a), random lines (b), lines of mathematical families (c), letting genes determine the presence or absence of mirrors in various planes of symmetry (d), and "archetypal" body form generated by <em>Blind Watchmaker</em>&rsquo;s artificial embryology (e).</figcaption>
 </figure>
 
-<p>I can best illustrate the idea in terms of the procedure that I ended up actually using.</p>
+<p id="p12">I can best illustrate the idea in terms of the procedure that I ended up actually using.</p>
 
 <pre>procedure Tree(x, y, length, dir, image, dx, dy, array [0..7] of integer);
 {Tree is called with the arrays dx &amp; dy specifying the form of the tree,
@@ -540,7 +602,7 @@
     end
   end;</pre>
 
-<p>What this procedure actually draws depends upon the starting value of the parameter <code>length</code>, and the values of <code>dx[0]</code> to <code>dx[7]</code> and <code>dy[0]</code> to <code>dy[7]</code> that are plugged in. A particular setting of these values, for instance, draws a tree like</p>
+<p id="p13">What this procedure actually draws depends upon the starting value of the parameter <code>length</code>, and the values of <code>dx[0]</code> to <code>dx[7]</code> and <code>dy[0]</code> to <code>dy[7]</code> that are plugged in. A particular setting of these values, for instance, draws a tree like</p>
 
 <figure data-figure="3" data-figure-type="recursive-tree">
   <div class="fig-toggle-wrap">
@@ -556,7 +618,7 @@
 </section>
 <section>
 <span class="page-num">p. 206</span>
-<p>Figure 2f, which I think of, somewhat arbitrarily, as the basic, "archetypal" body form generated by my artificial embryology. The sequence of pictures in Figure 3 shows the sequence of lines by which the tree is drawn by the recursive algorithm. Real-life embryology is quite like this, and very unlike the pixel-peppering zero-order embryology that we thought about before. Genes don't control small fragments of the body, the equivalent of pixels. Genes exert global growing rules, developmental processes, and embryological algorithms. Powerful though they are, an important feature of these growing rules is that they are local. There is no grand blueprint for the whole body. Instead, each cell obeys local instructions for dividing and differentiating, and when all the local instructions are obeyed together a body eventually results. Each little local repeat of the tree genotype in Figure 3 is the other local regions, and even (though this does not necessarily have to be true of all trees in my artificial world) like a scaled-down version of the whole tree. If, instead of branching a mere four times (this number is controlled by the starting value of depth), we let it branch, say, 10 times, an apparently complicated structure results (Figure 4). Look carefully at this tree, however, and you'll see that it is built up from fundamentally the same local drawing rules. The individual twigs don't "realise" that they are part of an elaborate pattern. This is all of a piece with the extreme simplicity of the procedure Tree. Probably there is an important similar sense in which real-life embryology, too, is simple.</p>
+<p id="p14">Figure 2f, which I think of, somewhat arbitrarily, as the basic, "archetypal" body form generated by my artificial embryology. The sequence of pictures in Figure 3 shows the sequence of lines by which the tree is drawn by the recursive algorithm. Real-life embryology is quite like this, and very unlike the pixel-peppering zero-order embryology that we thought about before. Genes don't control small fragments of the body, the equivalent of pixels. Genes exert global growing rules, developmental processes, and embryological algorithms. Powerful though they are, an important feature of these growing rules is that they are local. There is no grand blueprint for the whole body. Instead, each cell obeys local instructions for dividing and differentiating, and when all the local instructions are obeyed together a body eventually results. Each little local repeat of the tree genotype in Figure 3 is the other local regions, and even (though this does not necessarily have to be true of all trees in my artificial world) like a scaled-down version of the whole tree. If, instead of branching a mere four times (this number is controlled by the starting value of depth), we let it branch, say, 10 times, an apparently complicated structure results (Figure 4). Look carefully at this tree, however, and you'll see that it is built up from fundamentally the same local drawing rules. The individual twigs don't "realise" that they are part of an elaborate pattern. This is all of a piece with the extreme simplicity of the procedure Tree. Probably there is an important similar sense in which real-life embryology, too, is simple.</p>
 
 <figure data-figure="4" data-figure-type="biomorph">
   <div class="fig-toggle-wrap">
@@ -573,7 +635,7 @@
 <div id="widget-gene-explorer"></div>
 
 
-<p>Tree, then, was to be the basis of my embryology. Since the arrays <code>dx</code> and <code>dy</code>, and the parameter <code>length</code>, determine the shape of a tree, these were clearly the main items that should be controlled by genes. On the face of it this suggests that there should have been 16 genes, for 8 <code>dx</code> and 8 for <code>dy</code>. However I wanted, for biological reasons, to add one more constraint. Most animals are, as remarked above, bilaterally symmetrical. Such a requirement could be built into the biomorph embryology by constraining certain members of the <code>dx</code> and <code>dy</code> parameters to be equal to one another, sometimes with opposite sign. Instead of 16 genes, therefore, I ended up with 9. Genes 1 to 3 control clusters of the <code>dx</code> array. Genes 4 to 8 control clusters of the <code>dy</code> array. And Gene 9 encodes the starting value of depth, the "order" of the recursive tree or in other words the number of branchings. The details are as follows:</p>
+<p id="p15">Tree, then, was to be the basis of my embryology. Since the arrays <code>dx</code> and <code>dy</code>, and the parameter <code>length</code>, determine the shape of a tree, these were clearly the main items that should be controlled by genes. On the face of it this suggests that there should have been 16 genes, for 8 <code>dx</code> and 8 for <code>dy</code>. However I wanted, for biological reasons, to add one more constraint. Most animals are, as remarked above, bilaterally symmetrical. Such a requirement could be built into the biomorph embryology by constraining certain members of the <code>dx</code> and <code>dy</code> parameters to be equal to one another, sometimes with opposite sign. Instead of 16 genes, therefore, I ended up with 9. Genes 1 to 3 control clusters of the <code>dx</code> array. Genes 4 to 8 control clusters of the <code>dy</code> array. And Gene 9 encodes the starting value of depth, the "order" of the recursive tree or in other words the number of branchings. The details are as follows:</p>
 
 <pre>procedure Plug(in ThisGenotype: Genotype);
   {Plug translates genes into variables needed by Tree.}
@@ -593,13 +655,13 @@
 
   end {Plug};</pre>
 
-<p>The call of Tree then follows:</p>
+<p id="p16">The call of Tree then follows:</p>
 
 <pre>Tree(StartX, StartY, order, StartDir, dx, dy);</pre>
 
-<p>and the appropriate biomorph is drawn.</p>
+<p id="p17">and the appropriate biomorph is drawn.</p>
 
-<p><code>Plug</code> and <code>Tree</code>, then, are called in sequence within <code>Develop</code>, to draw any particular biomorph. <code>Reproduce</code> is then called a dozen or so times, breeding a litter of mutant progeny whose phenotypes are drawn, by <code>Develop</code>, on the screen (Figure 5). A human chooser then chooses one of the litter for breeding, its genes are fed into <code>Reproduce</code>, the screen is cleared and a new litter of progeny drawn, and the cycle</p>
+<p id="p18"><code>Plug</code> and <code>Tree</code>, then, are called in sequence within <code>Develop</code>, to draw any particular biomorph. <code>Reproduce</code> is then called a dozen or so times, breeding a litter of mutant progeny whose phenotypes are drawn, by <code>Develop</code>, on the screen (Figure 5). A human chooser then chooses one of the litter for breeding, its genes are fed into <code>Reproduce</code>, the screen is cleared and a new litter of progeny drawn, and the cycle</p>
 
 <figure data-figure="5" data-figure-type="breeding-screen">
   <div class="fig-toggle-wrap">
@@ -618,9 +680,9 @@
 </section>
 <section>
 <span class="page-num">p. 208</span>
-<p>continues indefinitely. As the generations go by, the forms evolve gradually in front of the chooser, who witnesses true evolution by Darwinian (artificial) selection.</p>
+<p id="p19">continues indefinitely. As the generations go by, the forms evolve gradually in front of the chooser, who witnesses true evolution by Darwinian (artificial) selection.</p>
 
-<p>As I said before, I had the intuitive feeling that some kind of recursive procedure would prove to be both morphologically prolific and biologically interesting. But I deliberately did not give much thought to the precise details of the recursive algorithm, because I wanted as much as possible to emerge rather than being designed. I had the feeling that it should not really matter how the genes affected development, provided the development procedure was some kind of recursive drawing rule. In the event, my intuition proved to have been a considerable underestimate. I was genuinely astonished and delighted at the richness of morphological types that emerged before my eyes as I bred. Figure 6 shows a small sample portfolio. Notice how many of the biomorphs are. They have evolved under the selective influence of a zoologist's eye, so it is not surprising that many of them resemble animals. Not particular animals that actually exist, necessarily, but several of the specimens in Figure 6 would not look out of place in a zoological textbook. Some were bred to resemble other things, for instance, the spitfire at middle left and the silver coffeepot at top right. It was biomorphs of the type shown in Figure 6 that</p>
+<p id="p20">As I said before, I had the intuitive feeling that some kind of recursive procedure would prove to be both morphologically prolific and biologically interesting. But I deliberately did not give much thought to the precise details of the recursive algorithm, because I wanted as much as possible to emerge rather than being designed. I had the feeling that it should not really matter how the genes affected development, provided the development procedure was some kind of recursive drawing rule. In the event, my intuition proved to have been a considerable underestimate. I was genuinely astonished and delighted at the richness of morphological types that emerged before my eyes as I bred. Figure 6 shows a small sample portfolio. Notice how many of the biomorphs are. They have evolved under the selective influence of a zoologist's eye, so it is not surprising that many of them resemble animals. Not particular animals that actually exist, necessarily, but several of the specimens in Figure 6 would not look out of place in a zoological textbook. Some were bred to resemble other things, for instance, the spitfire at middle left and the silver coffeepot at top right. It was biomorphs of the type shown in Figure 6 that</p>
 
 <figure data-figure="6" data-figure-type="portfolio">
   <div class="fig-toggle-wrap">
@@ -634,13 +696,13 @@
   <figcaption><strong>FIGURE 6</strong>&ensp;Portfolio of biomorphs varying according to nine genes.</figcaption>
 </figure>
 
-<p>I used<sup>1</sup> to illustrate the power of gradual cumulative selection to build up morphologies. The rest of this paper is about other families of biomorphs with more elaborate embryological principles.</p>
+<p id="p21">I used<sup>1</sup> to illustrate the power of gradual cumulative selection to build up morphologies. The rest of this paper is about other families of biomorphs with more elaborate embryological principles.</p>
 
-<h2>Symmetry</h2>
+<h2 id="sec-symmetry">Symmetry</h2>
 
-<p>In introducing the superiority of constrained embryologies over "pixel-peppering," I implied that constrainedness was a virtue. So it is, but you can have too much of a good thing. Having arrived at our basic recursive embryology, and found it good, are there any judicious relaxations or additions we can make to it, which will improve its biological richness? Remember that in doing this we must resist the temptation to take the easy route and build in known biological details. Our watchword is that as much as possible must emerge rather than being designed. But having seen the range of phenotypes that emerge from the basic program, can we think of any modifications to the basic program that seem likely to unleash capable flowerings of new emergent properties? In seeking such powerful enrichments, we need not fear to make use of general biological principles. All that we must avoid is building in detailed biological knowledge.</p>
+<p id="p22">In introducing the superiority of constrained embryologies over "pixel-peppering," I implied that constrainedness was a virtue. So it is, but you can have too much of a good thing. Having arrived at our basic recursive embryology, and found it good, are there any judicious relaxations or additions we can make to it, which will improve its biological richness? Remember that in doing this we must resist the temptation to take the easy route and build in known biological details. Our watchword is that as much as possible must emerge rather than being designed. But having seen the range of phenotypes that emerge from the basic program, can we think of any modifications to the basic program that seem likely to unleash capable flowerings of new emergent properties? In seeking such powerful enrichments, we need not fear to make use of general biological principles. All that we must avoid is building in detailed biological knowledge.</p>
 
-<p>I have already mentioned symmetry as an important constraint in real biology. The basic program produces biomorphs that all have to be bilaterally symmetrical. What if we relax this constraint, and allow asymmetrical biomorphs? It now becomes possible to breed forms like Figure 2e. Not very interesting in itself, but let us allow our biomorphs this kind of asymmetry nevertheless, because it may</p>
+<p id="p23">I have already mentioned symmetry as an important constraint in real biology. The basic program produces biomorphs that all have to be bilaterally symmetrical. What if we relax this constraint, and allow asymmetrical biomorphs? It now becomes possible to breed forms like Figure 2e. Not very interesting in itself, but let us allow our biomorphs this kind of asymmetry nevertheless, because it may</p>
 
 <figure data-figure="7" data-figure-type="symmetry-variations">
   <div class="fig-toggle-wrap">
@@ -661,13 +723,13 @@
 <span class="page-num">p. 210</span>
 <p>interact interestingly with other relaxations of the basic embryology that we shall allow. Let us, then, invent a new gene, one with only two values, on and off, which switches bilateral symmetry on or off.</p>
 
-<p>Left-right is not the only plane of symmetry at play in real animals' evolution. Suppose we take our basic <em>Blind Watchmaker</em> program but allow a new gene to switch on and off symmetry in the up-down direction. We can then breed shapes like Figure 7b. We can give this new gene an additional possible value, to enable it to switch on full, four-way radial symmetry (Figure 7c). Now let's come back to our other gene, for left-right asymmetry, and combine it with up-down symmetry. Here we have a decision to make. Do we consider that up-down symmetry is achieved by reflection in a horizontal mirror, in which case we can obtain a picture like Figure 7d? Or do we consider that it is achieved by rotation, in which case we shall obtain a picture like Figure 7e? I arbitrarily decided on the latter. When we combine left-right asymmetry with four-way radial symmetry we get a picture like Figure 7f. These symmetry genes, it seems to me, have the potential almost at once to seem to have the power to add rich emergent properties without the programmer having built in a lot of contrived design. I shall return to give further examples of the additional flowerings of biomorph structures that these two symmetry genes permit.</p>
+<p id="p24">Left-right is not the only plane of symmetry at play in real animals' evolution. Suppose we take our basic <em>Blind Watchmaker</em> program but allow a new gene to switch on and off symmetry in the up-down direction. We can then breed shapes like Figure 7b. We can give this new gene an additional possible value, to enable it to switch on full, four-way radial symmetry (Figure 7c). Now let's come back to our other gene, for left-right asymmetry, and combine it with up-down symmetry. Here we have a decision to make. Do we consider that up-down symmetry is achieved by reflection in a horizontal mirror, in which case we can obtain a picture like Figure 7d? Or do we consider that it is achieved by rotation, in which case we shall obtain a picture like Figure 7e? I arbitrarily decided on the latter. When we combine left-right asymmetry with four-way radial symmetry we get a picture like Figure 7f. These symmetry genes, it seems to me, have the potential almost at once to seem to have the power to add rich emergent properties without the programmer having built in a lot of contrived design. I shall return to give further examples of the additional flowerings of biomorph structures that these two symmetry genes permit.</p>
 
-<h2>Segmentation</h2>
+<h2 id="sec-seg">Segmentation</h2>
 
-<p>Symmetry is not the only such principle that is suggested by a general knowledge of real zoology. Segmentation is another widespread biological phenomenon that lends itself to biomorph treatment. Animals belonging to three of the most successful phyla&mdash;vertebrates, arthropods and annelids&mdash;organize their bodies along segmental lines. Segments are repeated modules, more or less the same as each other, running from head to tail like the trucks in a train. In an annelid worm such as an earthworm, or some arthropods such as millipedes, the segmentation is extremely obvious. A millipede really is rather like a train. It is easy to imagine that the developmental program of a millipede has the instructions for building a single segment, then obeys those instructions in a repeat loop. Segmentation is equally obvious in some vertebrates, such as snakes and fish when viewed internally. In mammals such as ourselves it is less prominent, but it is clearly seen in the backbone. Not only are the vertebral bones themselves "repeated" down the backbone, so are a whole series of associated blood vessels, muscles and nerves. Even the skull was originally segmented, but the traces of segmentation are now so well hidden that uncovering it was one of the triumphs of comparative anatomy. It is probably fair to say that the invention of segmentation was one of the major innovations in the history of life, an invention that was made at least twice, once by an ancestor of the vertebrates, and once by an ancestor of the annelids and arthropods (who are probably descended from a segmented common ancestor).</p>
+<p id="p25">Symmetry is not the only such principle that is suggested by a general knowledge of real zoology. Segmentation is another widespread biological phenomenon that lends itself to biomorph treatment. Animals belonging to three of the most successful phyla&mdash;vertebrates, arthropods and annelids&mdash;organize their bodies along segmental lines. Segments are repeated modules, more or less the same as each other, running from head to tail like the trucks in a train. In an annelid worm such as an earthworm, or some arthropods such as millipedes, the segmentation is extremely obvious. A millipede really is rather like a train. It is easy to imagine that the developmental program of a millipede has the instructions for building a single segment, then obeys those instructions in a repeat loop. Segmentation is equally obvious in some vertebrates, such as snakes and fish when viewed internally. In mammals such as ourselves it is less prominent, but it is clearly seen in the backbone. Not only are the vertebral bones themselves "repeated" down the backbone, so are a whole series of associated blood vessels, muscles and nerves. Even the skull was originally segmented, but the traces of segmentation are now so well hidden that uncovering it was one of the triumphs of comparative anatomy. It is probably fair to say that the invention of segmentation was one of the major innovations in the history of life, an invention that was made at least twice, once by an ancestor of the vertebrates, and once by an ancestor of the annelids and arthropods (who are probably descended from a segmented common ancestor).</p>
 
-<p>How might we change the <em>Blind Watchmaker</em> program to allow biomorphs to be organized like millipedes? The obvious way is to use the basic program to generate a single segment. Then, just as I postulated for millipede-clones above, run it in a repeat loop. So I added this feature to the program, with a new gene controlling the number of segments, and another new gene controlling the distance between segments. Figure 8a shows a series of biomorphs, identical except with respect to the value of the first of these genes. And in Figure 8b is a series, identical except with respect to the value of the second gene, the one controlling the distance between segments.</p>
+<p id="p26">How might we change the <em>Blind Watchmaker</em> program to allow biomorphs to be organized like millipedes? The obvious way is to use the basic program to generate a single segment. Then, just as I postulated for millipede-clones above, run it in a repeat loop. So I added this feature to the program, with a new gene controlling the number of segments, and another new gene controlling the distance between segments. Figure 8a shows a series of biomorphs, identical except with respect to the value of the first of these genes. And in Figure 8b is a series, identical except with respect to the value of the second gene, the one controlling the distance between segments.</p>
 
 <figure data-figure="8" data-figure-type="segmentation">
   <div class="fig-toggle-wrap">
@@ -685,12 +747,12 @@
 
 </section>
 <section>
-<h2>Gradients</h2>
+<h2 id="sec-grad">Gradients</h2>
 
 <span class="page-num">p. 212</span>
-<p>Finally, I introduced genes controlling segmental gradients. The segments of a millipede may all look pretty much the same, but many segmented animals taper, being broader at the front and narrower at the back. Others, for instance, wood lice and some fish, are narrow at each end and broad in the middle. The segments all down the body follow the same basic plan but get progressively larger or smaller, over sections of the animal's length from front to rear. It is as though the developmental repeat loop includes scaling factors that are incremented or decremented each time the program passes through the loop.</p>
+<p id="p27">Finally, I introduced genes controlling segmental gradients. The segments of a millipede may all look pretty much the same, but many segmented animals taper, being broader at the front and narrower at the back. Others, for instance, wood lice and some fish, are narrow at each end and broad in the middle. The segments all down the body follow the same basic plan but get progressively larger or smaller, over sections of the animal's length from front to rear. It is as though the developmental repeat loop includes scaling factors that are incremented or decremented each time the program passes through the loop.</p>
 
-<p>In introducing segmental gradients into the biomorph program, I aimed for greater generality than could be achieved with a single scaling factor. I allowed for gradients affecting the expression of each of the nine basic genes, and the inter-segment distance gene, separately. Figure 9 shows what happens if you put a gradient on Gene 1 and on Gene 4. The left-hand biomorph has no gradients and all the segments are the same. The middle biomorph is the same except that, as you move from front to rear, Gene 4's expressivity decreases by one unit per segment. The right hand biomorph shows the same for Gene 1.</p>
+<p id="p28">In introducing segmental gradients into the biomorph program, I aimed for greater generality than could be achieved with a single scaling factor. I allowed for gradients affecting the expression of each of the nine basic genes, and the inter-segment distance gene, separately. Figure 9 shows what happens if you put a gradient on Gene 1 and on Gene 4. The left-hand biomorph has no gradients and all the segments are the same. The middle biomorph is the same except that, as you move from front to rear, Gene 4's expressivity decreases by one unit per segment. The right hand biomorph shows the same for Gene 1.</p>
 
 <figure data-figure="9" data-figure-type="gradients">
   <div class="fig-toggle-wrap">
@@ -707,7 +769,7 @@
 <div id="widget-gradients"></div>
 
 
-<p>Figure 10 is a portfolio of segmented biomorphs, most of them with gradients. These are biomorphs that have been bred by selection, in the same way as those in Figure 6, but with the possibility of mutation in the two segment-controlling genes. You can think of the Figure 6 biomorphs as having had these two genes set to zero. If you compare Figure 10 with Figure 6, I think you'll agree that segmentation has added to the ecological interest of the specimens. An embryological innovation, in this case segmentation, has allowed the evolution of a whole new range of types. We may conjecture that much the same thing happened in the ancestry of the vertebrates and in the separate ancestry of the annelids and arthropods.</p>
+<p id="p29">Figure 10 is a portfolio of segmented biomorphs, most of them with gradients. These are biomorphs that have been bred by selection, in the same way as those in Figure 6, but with the possibility of mutation in the two segment-controlling genes. You can think of the Figure 6 biomorphs as having had these two genes set to zero. If you compare Figure 10 with Figure 6, I think you'll agree that segmentation has added to the ecological interest of the specimens. An embryological innovation, in this case segmentation, has allowed the evolution of a whole new range of types. We may conjecture that much the same thing happened in the ancestry of the vertebrates and in the separate ancestry of the annelids and arthropods.</p>
 
 <figure data-figure="10" data-figure-type="portfolio">
   <div class="fig-toggle-wrap">
@@ -721,7 +783,7 @@
   <figcaption><strong>FIGURE 10</strong>&ensp;Portfolio of segmented biomorphs.</figcaption>
 </figure>
 
-<p>But the animals in Figure 10 are all bilaterally symmetrical. What happens if we combine segmentation with asymmetry? At this point in the programming, I introduced another arbitrary constraint. I simply decreed that when a one-sided animal like Figure 10a became segmented, instead of each segment simply repeating the asymmetry as in Figure 11b, the successive segments should always be asymmetrical in alternate directions, as in Figure 11c. There was no particular reason why I should have done this. I think I did it partly because I wanted to use segmentation to help recreate, at the level of the whole body, the symmetry that had been lost at the level of the individual segment. And I also think I did it partly to make the biomorphs more botanically interesting. Many plants send off alternating buds. Indeed, my portfolio (Figure 12) of asymmetrical segmented biomorphs may interest botanists more than zoologists. When I was breeding them by artificial selection on the screen, I frequently had plants in my mind. The biomorph at the top</p>
+<p id="p30">But the animals in Figure 10 are all bilaterally symmetrical. What happens if we combine segmentation with asymmetry? At this point in the programming, I introduced another arbitrary constraint. I simply decreed that when a one-sided animal like Figure 10a became segmented, instead of each segment simply repeating the asymmetry as in Figure 11b, the successive segments should always be asymmetrical in alternate directions, as in Figure 11c. There was no particular reason why I should have done this. I think I did it partly because I wanted to use segmentation to help recreate, at the level of the whole body, the symmetry that had been lost at the level of the individual segment. And I also think I did it partly to make the biomorphs more botanically interesting. Many plants send off alternating buds. Indeed, my portfolio (Figure 12) of asymmetrical segmented biomorphs may interest botanists more than zoologists. When I was breeding them by artificial selection on the screen, I frequently had plants in my mind. The biomorph at the top</p>
 
 <figure data-figure="11" data-figure-type="symmetry-segmentation">
   <div class="fig-toggle-wrap">
@@ -737,7 +799,7 @@
 </section>
 <section>
 <span class="page-num">p. 214</span>
-<p>left could be any of a wide variety of plant species. The one next to it could be an inflorescence, or perhaps a colonial animal such as a siphonophore. While looking at the top row, notice the hockey stick and the colour of Liechtenstein. The next row begins with DNA, and contains a dollar sign which also looks rather like a different view of DNA.</p>
+<p id="p31">left could be any of a wide variety of plant species. The one next to it could be an inflorescence, or perhaps a colonial animal such as a siphonophore. While looking at the top row, notice the hockey stick and the colour of Liechtenstein. The next row begins with DNA, and contains a dollar sign which also looks rather like a different view of DNA.</p>
 
 <figure data-figure="12" data-figure-type="portfolio">
   <div class="fig-toggle-wrap">
@@ -778,9 +840,9 @@
 <div id="widget-full-dawkins"></div>
 
 
-<p>I present my "echinoderm" portfolio (Figure 14) as another illustration of all my "new" mutation types&mdash;all the various symmetry mutations, and the segmentation and gradient mutations. Any zoologist will instantly spot the trouble with these "echinoderms." They have four-way radial symmetry rather than five-way symmetry. The present program is not capable of producing five-way radial symmetry. Once again, we are brought back to our major theme. Huge vistas of evolutionary possibility, in real life as well as in artificial life, may be kept waiting a very long time, if not indefinitely, for a major, releasing change in embryology. Which brings me to the problems of the biomorph alphabet.</p>
+<p id="p32">I present my "echinoderm" portfolio (Figure 14) as another illustration of all my "new" mutation types&mdash;all the various symmetry mutations, and the segmentation and gradient mutations. Any zoologist will instantly spot the trouble with these "echinoderms." They have four-way radial symmetry rather than five-way symmetry. The present program is not capable of producing five-way radial symmetry. Once again, we are brought back to our major theme. Huge vistas of evolutionary possibility, in real life as well as in artificial life, may be kept waiting a very long time, if not indefinitely, for a major, releasing change in embryology. Which brings me to the problems of the biomorph alphabet.</p>
 
-<p>If we can breed animals and plants, I thought, why not any arbitrarily designated shapes? You can't get much more arbitrary than the alphabet, so how about an alphabet of biomorphs? While breeding, wandering around in "Biomorph Land,"<sup>1</sup> I would sometimes encounter biomorphs that had a slight look of one of the letters of the alphabet. I then would try to perfect the resemblance by selective breeding, preserving intermediate results and returning to try again whenever I had an idle moment. In this way I gradually built up an album of alphabetic characters. My aim was eventually to sign my name legibly in biomorph script. Figure 15a shows that I have not quite achieved this yet, although I had more luck (Figure 15b) in using biomorph script to pay tribute to the uniquely brilliant microcomputer which made all this work so easy. The problems are not trivial. Some</p>
+<p id="p33">If we can breed animals and plants, I thought, why not any arbitrarily designated shapes? You can't get much more arbitrary than the alphabet, so how about an alphabet of biomorphs? While breeding, wandering around in "Biomorph Land,"<sup>1</sup> I would sometimes encounter biomorphs that had a slight look of one of the letters of the alphabet. I then would try to perfect the resemblance by selective breeding, preserving intermediate results and returning to try again whenever I had an idle moment. In this way I gradually built up an album of alphabetic characters. My aim was eventually to sign my name legibly in biomorph script. Figure 15a shows that I have not quite achieved this yet, although I had more luck (Figure 15b) in using biomorph script to pay tribute to the uniquely brilliant microcomputer which made all this work so easy. The problems are not trivial. Some</p>
 
 <figure data-figure="15" data-figure-type="alphabet">
   <div class="fig-toggle-wrap">
@@ -801,34 +863,34 @@
 <span class="page-num">p. 216</span>
 <p>letters are perfect, like I and N. Others are a little cold, but still not unpleasing, for instance S and A. D is pretty horrible, and I need to get rid of the dreamy little upward-pointing tail. As for K, I despair of ever breeding a proper K. I simply had to fake it in my name by turning part of a H into the preceding W, as obvious kludge.</p>
 
-<h2>The Evolution of Evolvability</h2>
+<h2 id="sec-evo">The Evolution of Evolvability</h2>
 
-<p>And that is the point. There are some things that certain kinds of embryology cannot do, or cannot easily do. My biomorph alphabet was intended to dramatize this. It makes the point that some letter-shapes are easy, indeed almost inevitable; others are difficult, and others near-impossible. The problems for my breeding program are determined by the particular kind of embryology that the program happens to employ. If I were to invent a different embryology for my biomorphs, a different subset of the alphabet would become easy. For instance, it is not far-fetched to guess that, if we added the "alternations" constraint on segmented asymmetrical biomorphs, K would become easy. The way to do this, is keeping our na&iuml;ve extensions to the embryology, would be to add an "alternation gene" which could mutate on and off as at will. Then all present biomorphs would be a subset of the larger set that would henceforth become possible&mdash;the subset with the alternation gene permanently turned on. K would also be easy to breed if we had taken the decision to achieve up-down symmetry by mirror reflection rather than by rotation (see above). Leaving the biomorph alphabet as one side, many other new kinds of mutation could be implemented, including genes controlling color. The prototype color version that I have now running on the Macintosh II computer, generously provided by Apple Computer Inc., produces results spectacular beyond my previous imagination, though so far the aesthetic appeal of these colored biomorphs has overshadowed their biological interest.</p>
+<p id="p34">And that is the point. There are some things that certain kinds of embryology cannot do, or cannot easily do. My biomorph alphabet was intended to dramatize this. It makes the point that some letter-shapes are easy, indeed almost inevitable; others are difficult, and others near-impossible. The problems for my breeding program are determined by the particular kind of embryology that the program happens to employ. If I were to invent a different embryology for my biomorphs, a different subset of the alphabet would become easy. For instance, it is not far-fetched to guess that, if we added the "alternations" constraint on segmented asymmetrical biomorphs, K would become easy. The way to do this, is keeping our na&iuml;ve extensions to the embryology, would be to add an "alternation gene" which could mutate on and off as at will. Then all present biomorphs would be a subset of the larger set that would henceforth become possible&mdash;the subset with the alternation gene permanently turned on. K would also be easy to breed if we had taken the decision to achieve up-down symmetry by mirror reflection rather than by rotation (see above). Leaving the biomorph alphabet as one side, many other new kinds of mutation could be implemented, including genes controlling color. The prototype color version that I have now running on the Macintosh II computer, generously provided by Apple Computer Inc., produces results spectacular beyond my previous imagination, though so far the aesthetic appeal of these colored biomorphs has overshadowed their biological interest.</p>
 
-<p>Finally, let us return to the evolution of evolvability. The point I have been trying to make so far in this paper is that certain kinds of embryology find it difficult to generate certain kinds of biomorph; other kinds of embryology find it easy to do it. In doing so it may have been a powerful analogy for something important about real biology, a major principle of real life that is illustrated by artificial life. It is less clear which of several possible principles it is! There are two</p>
+<p id="p35">Finally, let us return to the evolution of evolvability. The point I have been trying to make so far in this paper is that certain kinds of embryology find it difficult to generate certain kinds of biomorph; other kinds of embryology find it easy to do it. In doing so it may have been a powerful analogy for something important about real biology, a major principle of real life that is illustrated by artificial life. It is less clear which of several possible principles it is! There are two</p>
 
 <span class="page-num">p. 217</span>
 <p>main candidates, which I must take some time to expound in order to explain why I favor one rather than the other.</p>
 
-<p>In order to explain the first one, we need to make a preliminary distinction between two kinds of mutation: ordinary changes within an existing genetic system, and changes to the genetic system itself. Ordinary changes within an existing genetic system are the standard innovations that may or may not be selected in normal evolution within a species. One allele is replaced by an alternative allele at the same locus, as in the famous case of industrial melanism where a gene for blackness spread through moth populations in industrial areas (now a very hackneyed example). This is how all normal evolutionary change happens. But it is an interesting fact that there are different genetic systems. It is possible to have different genetic systems from one another, even if this only means that they have different numbers of chromosomes. "The same locus," when we are talking about changes within a genetic system, may not even be a meaningful thing to say. Humans and chimpanzee may employ the same kind of genetic system, but they don't have the same genetic system. They have different numbers of chromosomes and you can't precisely identify loci for hopping between them like you can between two individual humans. Yet humans and chimpanzees undoubtedly have a common ancestor. Somewhere in their evolutionary divergence, there must have been changes to the genetic system as well as changes to the genetic system. These changes in genetic system must have been, at least in one sense, major changes, changes of a different order from the normal allele substitutions that go on within a genetic system.</p>
+<p id="p36">In order to explain the first one, we need to make a preliminary distinction between two kinds of mutation: ordinary changes within an existing genetic system, and changes to the genetic system itself. Ordinary changes within an existing genetic system are the standard innovations that may or may not be selected in normal evolution within a species. One allele is replaced by an alternative allele at the same locus, as in the famous case of industrial melanism where a gene for blackness spread through moth populations in industrial areas (now a very hackneyed example). This is how all normal evolutionary change happens. But it is an interesting fact that there are different genetic systems. It is possible to have different genetic systems from one another, even if this only means that they have different numbers of chromosomes. "The same locus," when we are talking about changes within a genetic system, may not even be a meaningful thing to say. Humans and chimpanzee may employ the same kind of genetic system, but they don't have the same genetic system. They have different numbers of chromosomes and you can't precisely identify loci for hopping between them like you can between two individual humans. Yet humans and chimpanzees undoubtedly have a common ancestor. Somewhere in their evolutionary divergence, there must have been changes to the genetic system as well as changes to the genetic system. These changes in genetic system must have been, at least in one sense, major changes, changes of a different order from the normal allele substitutions that go on within a genetic system.</p>
 
-<p>Now, the changes to the biomorph program that I have been talking about in this paper&mdash;the additions of symmetry modifications and segmentation genes and so on&mdash;are, it happens, changes of just this character, changes to the genetic system. They constituted major switchings of the program to increase the "dimensionality" of the space from 9 to 13 genes. But I want to argue that this is incidental. This is not the analogy that I want to draw between artificial life and real life. Changes in genetic system must, indeed, be fairly commonplace in the history of evolution&mdash;changes in chromosome number are nearly as common as initiations of new species, and the number of species initiations that have occurred in the history of life is probably to be counted in the hundreds of millions. So, although changes in genetic systems are much rarer than allele substitutions within genetic systems, they are not very rare events on the geological timescale.</p>
+<p id="p37">Now, the changes to the biomorph program that I have been talking about in this paper&mdash;the additions of symmetry modifications and segmentation genes and so on&mdash;are, it happens, changes of just this character, changes to the genetic system. They constituted major switchings of the program to increase the "dimensionality" of the space from 9 to 13 genes. But I want to argue that this is incidental. This is not the analogy that I want to draw between artificial life and real life. Changes in genetic system must, indeed, be fairly commonplace in the history of evolution&mdash;changes in chromosome number are nearly as common as initiations of new species, and the number of species initiations that have occurred in the history of life is probably to be counted in the hundreds of millions. So, although changes in genetic systems are much rarer than allele substitutions within genetic systems, they are not very rare events on the geological timescale.</p>
 
-<p>What I want to argue is that there is another class of innovations which are very rare on the geological timescale and which I shall call evolutionary watersheds. An evolutionary watershed is something like the invention of segmentation which, as we have seen, may have occurred only twice in history, once in the lineage leading to annelids and arthropods and once in the lineage leading to vertebrates. A watershed event like this may or may not have coincided with a change in the genetic system such as a change in chromosome number. In any case that is not what is interesting about watershed events. What is interesting about them is that they open floodgates to future evolution.</p>
+<p id="p38">What I want to argue is that there is another class of innovations which are very rare on the geological timescale and which I shall call evolutionary watersheds. An evolutionary watershed is something like the invention of segmentation which, as we have seen, may have occurred only twice in history, once in the lineage leading to annelids and arthropods and once in the lineage leading to vertebrates. A watershed event like this may or may not have coincided with a change in the genetic system such as a change in chromosome number. In any case that is not what is interesting about watershed events. What is interesting about them is that they open floodgates to future evolution.</p>
 
-<p>I conjecture that the first segmented animal was a dramatically successful individual. It was a freak, with a double (or multiple) body where its parents had a single body. Its parents' single body plan was at least fairly well adapted to the species' way of life, otherwise they would not have been producing it. It is not, on the face of it, that a double body would have been better adapted. Quite the contrary. Nevertheless, it arrived (we now know this because its segmented descendants are still around). It only (thin, of course,) is conjured by the skin of its teeth. Even though I may exaggerate when I say "by the skin of its teeth," the point I really want to make is that the individual success, or otherwise, of the first segmented animal during its own lifetime is relatively unimportant. An adult segmented animal may have been more successful as individuals. What is important about the first segmented animal is that its descendants lineages were champion radiators. They radiated, speciated, and gave rise to whole new phyla. Whether or not segmentation was a beneficial adaptation during the individual lifetime of the first segmented animal, segmentation represented a change to embryology that was pregnant with evolutionary potential.</p>
+<p id="p39">I conjecture that the first segmented animal was a dramatically successful individual. It was a freak, with a double (or multiple) body where its parents had a single body. Its parents' single body plan was at least fairly well adapted to the species' way of life, otherwise they would not have been producing it. It is not, on the face of it, that a double body would have been better adapted. Quite the contrary. Nevertheless, it arrived (we now know this because its segmented descendants are still around). It only (thin, of course,) is conjured by the skin of its teeth. Even though I may exaggerate when I say "by the skin of its teeth," the point I really want to make is that the individual success, or otherwise, of the first segmented animal during its own lifetime is relatively unimportant. An adult segmented animal may have been more successful as individuals. What is important about the first segmented animal is that its descendants lineages were champion radiators. They radiated, speciated, and gave rise to whole new phyla. Whether or not segmentation was a beneficial adaptation during the individual lifetime of the first segmented animal, segmentation represented a change to embryology that was pregnant with evolutionary potential.</p>
 
-<p>Not all evolutionary watersheds are as dramatic in their magnitude or in their consequences as the invention of segmentation. There may be many changes in embryology which, though not dramatic enough in themselves ever to deserve the title watershed, nonetheless are, to a lesser extent like the invention of segmentation, evolutionarily pregnant. Suppose we rank embryologies in order of evolutionary potential. Then as evolution processes and adaptive radiations give way to adaptive radiations, there is presumably a kind of ratchet such that changes in embryology that happen to be relatively fertile, evolutionarily speaking, tend to last while embryologies that are evolutionarily fertile tend to be the embryologies that characterize the forms of life that we actually see. As the ages go by, changes in embryology that increase evolutionary richness tend to be self-preserving. Note that this is not the same thing as saying that embryologies that give rise to good, healthy individual organisms tend to be the embryologies that are still with us, although that, too, is no doubt true. I am talking about a kind of higher-level selection, a selection not for survivability but for evolvability.</p>
+<p id="p40">Not all evolutionary watersheds are as dramatic in their magnitude or in their consequences as the invention of segmentation. There may be many changes in embryology which, though not dramatic enough in themselves ever to deserve the title watershed, nonetheless are, to a lesser extent like the invention of segmentation, evolutionarily pregnant. Suppose we rank embryologies in order of evolutionary potential. Then as evolution processes and adaptive radiations give way to adaptive radiations, there is presumably a kind of ratchet such that changes in embryology that happen to be relatively fertile, evolutionarily speaking, tend to last while embryologies that are evolutionarily fertile tend to be the embryologies that characterize the forms of life that we actually see. As the ages go by, changes in embryology that increase evolutionary richness tend to be self-preserving. Note that this is not the same thing as saying that embryologies that give rise to good, healthy individual organisms tend to be the embryologies that are still with us, although that, too, is no doubt true. I am talking about a kind of higher-level selection, a selection not for survivability but for evolvability.</p>
 
 <span class="page-num">p. 218</span>
-<p>It is all too easy for this kind of argument to be used loosely and unrespectably. Sydney Brenner justly ridiculed the idea of foresight in evolution, specifically the notion that a molecule, useless in its own geological era, in its own ecological context, might nevertheless be retained in the gene pool because of its possible usefulness in some future era. "It might come in handy in the Cretaceous!" I hope I shall not be taken as saying anything like that. We certainly should have no truck with suggestions that individual animals might forgo their selfish advantage because of possible long-term evolutionary benefits to their species. Evolution has no foresight. But with hindsight, those evolutionary changes in embryology that fed as though they were planned with foresight are the ones that dominate successful forms of life.</p>
+<p id="p41">It is all too easy for this kind of argument to be used loosely and unrespectably. Sydney Brenner justly ridiculed the idea of foresight in evolution, specifically the notion that a molecule, useless in its own geological era, in its own ecological context, might nevertheless be retained in the gene pool because of its possible usefulness in some future era. "It might come in handy in the Cretaceous!" I hope I shall not be taken as saying anything like that. We certainly should have no truck with suggestions that individual animals might forgo their selfish advantage because of possible long-term evolutionary benefits to their species. Evolution has no foresight. But with hindsight, those evolutionary changes in embryology that fed as though they were planned with foresight are the ones that dominate successful forms of life.</p>
 
-<p>Perhaps there is a sense in which a form of natural selection favors, not just adaptively successful phenotypes, but a tendency to evolve in certain directions, or even just a tendency to evolve at all. If the embryologies of the great phyla, classes and orders naturally display the ability to "evolve in certain directions, to continue to evolve in other directions, could these "eagerness" and "reluctances" have themselves been favoured by a kind of natural selection? In the world filled with animal groups which not only are successful, individually, at the business of living, but which are also successful at throwing up new variations on their theme? If you want all this in a motto, it would be simply another case, like stirring paint, of what I have called "single-step selection" and therefore not very interesting, evolutionarily speaking. It is only cumulative selection that is evolutionarily interesting, for only cumulative selection has the power to build new progress on the shoulders of earlier generations of selection, and therefore has the power to build the formidable complexity that is diagnostic of life. I have been in the habit of disparaging the idea of "species selection" because, as is normally propounded, it is a form of single-step selection, not cumulative selection, and therefore not competent to produce the evolution of complex adaptations. But selection among embryologies for the property of evolvability, it seems to me, may have the necessary qualifications because cumulative selection has interesting evolutionary consequences. It is the ratchet I have referred to. After a given innovation in embryology has been favoured for its evolutionary properties, it provides a different basis for new innovations in embryology. Obviously the idea of each new adaptation serving as the background to the evolution of subsequent adaptations is not new. What may be new is its application to the idea of cumulative selection. What I am now suggesting is that the same principle may apply to the evolution of evolvability which, therefore, may be cumulative.</p>
+<p id="p42">Perhaps there is a sense in which a form of natural selection favors, not just adaptively successful phenotypes, but a tendency to evolve in certain directions, or even just a tendency to evolve at all. If the embryologies of the great phyla, classes and orders naturally display the ability to "evolve in certain directions, to continue to evolve in other directions, could these "eagerness" and "reluctances" have themselves been favoured by a kind of natural selection? In the world filled with animal groups which not only are successful, individually, at the business of living, but which are also successful at throwing up new variations on their theme? If you want all this in a motto, it would be simply another case, like stirring paint, of what I have called "single-step selection" and therefore not very interesting, evolutionarily speaking. It is only cumulative selection that is evolutionarily interesting, for only cumulative selection has the power to build new progress on the shoulders of earlier generations of selection, and therefore has the power to build the formidable complexity that is diagnostic of life. I have been in the habit of disparaging the idea of "species selection" because, as is normally propounded, it is a form of single-step selection, not cumulative selection, and therefore not competent to produce the evolution of complex adaptations. But selection among embryologies for the property of evolvability, it seems to me, may have the necessary qualifications because cumulative selection has interesting evolutionary consequences. It is the ratchet I have referred to. After a given innovation in embryology has been favoured for its evolutionary properties, it provides a different basis for new innovations in embryology. Obviously the idea of each new adaptation serving as the background to the evolution of subsequent adaptations is not new. What may be new is its application to the idea of cumulative selection. What I am now suggesting is that the same principle may apply to the evolution of evolvability which, therefore, may be cumulative.</p>
 
 <span class="page-num">p. 219</span>
-<p>Others have pointed out that one should really speak of "species selection" only in the rare cases where a true species-level quality is being evolved.<sup>6</sup> "Species selection," for instance, should not be invoked to explain an evolutionary lengthening in the legs: species don't have legs (although, on the other hand, it might on the other hand be invoked to explain the evolution of a tendency to speciate, since speciating is a thing species, but not individuals, do). It now seems to me that the tendency to evolve is pregnant with evolutionary potential is a good candidate for a higher-level property of just the kind that we must have before we allow ourselves to speak of species or higher-level selection.</p>
+<p id="p43">Others have pointed out that one should really speak of "species selection" only in the rare cases where a true species-level quality is being evolved.<sup>6</sup> "Species selection," for instance, should not be invoked to explain an evolutionary lengthening in the legs: species don't have legs (although, on the other hand, it might on the other hand be invoked to explain the evolution of a tendency to speciate, since speciating is a thing species, but not individuals, do). It now seems to me that the tendency to evolve is pregnant with evolutionary potential is a good candidate for a higher-level property of just the kind that we must have before we allow ourselves to speak of species or higher-level selection.</p>
 
-<p>The world is dominated by phyla, classes and orders whose embryology equipped them to diverge and inherit the earth. Although I am sure I have always been dimly aware of this, I think it is true to say that it is the biomorph program&mdash;writing it, playing with it, and above all modifying it as iterative on evolutionary potential&mdash;that has really drummed it into my innermost convictions. So what started out as an educational exercise&mdash;I was trying to develop a tool to teach other people&mdash;ended up as an educational exercise in another sense. I ended up teaching something to myself about real life. There could be less worthy uses of artificial life.</p>
+<p id="p44">The world is dominated by phyla, classes and orders whose embryology equipped them to diverge and inherit the earth. Although I am sure I have always been dimly aware of this, I think it is true to say that it is the biomorph program&mdash;writing it, playing with it, and above all modifying it as iterative on evolutionary potential&mdash;that has really drummed it into my innermost convictions. So what started out as an educational exercise&mdash;I was trying to develop a tool to teach other people&mdash;ended up as an educational exercise in another sense. I ended up teaching something to myself about real life. There could be less worthy uses of artificial life.</p>
 </section>
 
 <div id="widget-graduation"></div>
@@ -2104,6 +2166,146 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     });
   });
 });
+
+
+// === Paragraph Index ===
+(function() {
+  const PARA_INDEX = [
+    { id: 'p1', label: 'Artificial life' },
+    { id: 'p2', label: 'needs replicators' },
+    { id: 'p3', label: "and Weismann’s principle:" },
+    { id: 'p4', label: 'genes build phenotypes' },
+    { id: 'p5', label: 'but genetics ≠ embryology.' },
+    { id: 'p6', label: 'Reproduce and Develop —' },
+    { id: 'p7', label: 'what goes in Develop?' },
+    { id: 'p8', label: 'Pixel-peppering fails' },
+    { id: 'p9', label: 'so constrain the search.' },
+    { id: 'p10', label: 'Better embryologies' },
+    { id: 'p11', label: 'use recursion.' },
+    { id: 'p12', label: 'The Tree procedure' },
+    { id: 'p13', label: 'draws branching forms' },
+    { id: 'p14', label: 'from local rules.' },
+    { id: 'p15', label: 'Nine genes suffice' },
+    { id: 'p16', label: 'to call Tree,' },
+    { id: 'p17', label: 'draw a biomorph,' },
+    { id: 'p18', label: 'breed a litter,' },
+    { id: 'p19', label: 'watch evolution unfold —' },
+    { id: 'p20', label: 'astonishing morphologies!' },
+    { id: 'p21', label: 'Cumulative selection works.' },
+    { id: 'sec-symmetry', label: 'SYMMETRY', heading: true },
+    { id: 'p22', label: 'Relax constraints' },
+    { id: 'p23', label: 'to allow asymmetry,' },
+    { id: 'p24', label: 'explore new planes.' },
+    { id: 'sec-seg', label: 'SEGMENTATION', heading: true },
+    { id: 'p25', label: 'Repeat body modules' },
+    { id: 'p26', label: 'like millipedes.' },
+    { id: 'sec-grad', label: 'GRADIENTS', heading: true },
+    { id: 'p27', label: 'Segments now taper,' },
+    { id: 'p28', label: 'one gradient per gene.' },
+    { id: 'p29', label: 'Richer ecology results.' },
+    { id: 'p30', label: 'Alternating asymmetry' },
+    { id: 'p31', label: 'yields botanical forms.' },
+    { id: 'p32', label: 'Echinoderms reveal limits.' },
+    { id: 'p33', label: 'Breed the alphabet —' },
+    { id: 'sec-evo', label: 'THE POINT', heading: true },
+    { id: 'p34', label: 'embryology sets limits.' },
+    { id: 'p35', label: 'Two rival principles:' },
+    { id: 'p36', label: 'genetic system changes' },
+    { id: 'p37', label: 'are incidental.' },
+    { id: 'p38', label: 'Evolutionary watersheds' },
+    { id: 'p39', label: 'open floodgates.' },
+    { id: 'p40', label: 'Evolvability ratchets up —' },
+    { id: 'p41', label: 'not foresight, hindsight.' },
+    { id: 'p42', label: 'Selection favors evolvability' },
+    { id: 'p43', label: 'as a species property.' },
+    { id: 'p44', label: 'Artificial life taught me.' }
+  ];
+
+  const inner = document.querySelector('.pi-inner');
+  if (!inner) return;
+
+  const entries = [];
+  const targets = [];
+
+  PARA_INDEX.forEach(item => {
+    const a = document.createElement('a');
+    a.className = 'pi-entry' + (item.heading ? ' pi-heading' : '');
+    a.textContent = item.label;
+    a.href = '#' + item.id;
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const el = document.getElementById(item.id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState(null, '', '#' + item.id);
+      }
+    });
+    inner.appendChild(a);
+    entries.push(a);
+    targets.push(item.id);
+  });
+
+  // Scroll tracking
+  let ticking = false;
+  let activeIdx = -1;
+
+  function updateActive() {
+    const threshold = window.innerHeight * 0.15;
+    let bestIdx = 0;
+    let bestDist = Infinity;
+
+    for (let i = 0; i < targets.length; i++) {
+      const el = document.getElementById(targets[i]);
+      if (!el) continue;
+      const top = el.getBoundingClientRect().top;
+      const dist = Math.abs(top - threshold);
+      // Prefer elements that are at or above the threshold line
+      if (top <= threshold + 10) {
+        if (top > -window.innerHeight) {
+          bestIdx = i;
+          bestDist = dist;
+        }
+      } else if (bestDist === Infinity) {
+        // Nothing above threshold yet, take closest below
+        if (dist < bestDist) {
+          bestIdx = i;
+          bestDist = dist;
+        }
+      }
+    }
+
+    if (bestIdx !== activeIdx) {
+      if (activeIdx >= 0) entries[activeIdx].classList.remove('active');
+      entries[bestIdx].classList.add('active');
+      activeIdx = bestIdx;
+
+      // Auto-scroll sidebar to keep active entry visible
+      const entry = entries[bestIdx];
+      const container = inner;
+      const entryTop = entry.offsetTop;
+      const entryH = entry.offsetHeight;
+      const scrollTop = container.scrollTop;
+      const containerH = container.clientHeight;
+
+      if (entryTop < scrollTop + 60) {
+        container.scrollTo({ top: Math.max(0, entryTop - 60), behavior: 'smooth' });
+      } else if (entryTop + entryH > scrollTop + containerH - 60) {
+        container.scrollTo({ top: entryTop + entryH - containerH + 60, behavior: 'smooth' });
+      }
+    }
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(updateActive);
+    }
+  }, { passive: true });
+
+  // Initial update
+  requestAnimationFrame(updateActive);
+})();
 </script>
 </body>
 </html>
