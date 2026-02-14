@@ -860,13 +860,15 @@
 
   /* ── Inline text highlight ── */
   mark.fc-hl {
-    background: rgba(88,166,255,0.18);
+    background: rgba(88,166,255,0.35);
     color: inherit;
     border-radius: 2px;
-    padding: 0 1px;
+    padding: 1px 2px;
+    border-bottom: 2px solid rgba(88,166,255,0.6);
   }
   mark.fc-hl-qa {
-    background: rgba(240,136,62,0.18);
+    background: rgba(240,136,62,0.35);
+    border-bottom-color: rgba(240,136,62,0.6);
   }
 
   .fc-card-para {
@@ -2878,8 +2880,8 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
       qInput.value = '';
       qInput.placeholder = 'Question...';
       aInput.style.display = '';
-      aInput.value = '';
-      aInput.placeholder = 'Answer (optional — defaults to selection)';
+      aInput.value = selText;
+      aInput.placeholder = 'Answer';
     }
 
     positionEditor();
@@ -3142,19 +3144,72 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     var src = card.source || card.anchor;
     if (!src) return;
 
-    // Walk text nodes to find the source text
+    // Find source text offset within paragraph's full textContent
+    var fullText = para.textContent;
+    var startOffset = fullText.indexOf(src);
+    if (startOffset === -1) return;
+    var endOffset = startOffset + src.length;
+
+    // Map character offsets to DOM text nodes
     var walker = document.createTreeWalker(para, NodeFilter.SHOW_TEXT);
-    var node;
+    var node, charCount = 0;
+    var startNode = null, startIdx = 0, endNode = null, endIdx = 0;
+
     while (node = walker.nextNode()) {
-      var idx = node.textContent.indexOf(src);
-      if (idx !== -1) {
-        var range = document.createRange();
-        range.setStart(node, idx);
-        range.setEnd(node, idx + src.length);
+      var len = node.textContent.length;
+      if (!startNode && charCount + len > startOffset) {
+        startNode = node;
+        startIdx = startOffset - charCount;
+      }
+      if (charCount + len >= endOffset) {
+        endNode = node;
+        endIdx = endOffset - charCount;
+        break;
+      }
+      charCount += len;
+    }
+
+    if (!startNode || !endNode) return;
+
+    // If start and end are in the same text node, simple wrap
+    if (startNode === endNode) {
+      var range = document.createRange();
+      range.setStart(startNode, startIdx);
+      range.setEnd(endNode, endIdx);
+      var mark = document.createElement('mark');
+      mark.className = 'fc-hl' + (card.type === 'qa' ? ' fc-hl-qa' : '');
+      range.surroundContents(mark);
+      return;
+    }
+
+    // Multi-node: wrap each text segment individually
+    var hlClass = 'fc-hl' + (card.type === 'qa' ? ' fc-hl-qa' : '');
+    var nodes = [];
+    walker = document.createTreeWalker(para, NodeFilter.SHOW_TEXT);
+    var inRange = false;
+    while (node = walker.nextNode()) {
+      if (node === startNode) { inRange = true; nodes.push(node); continue; }
+      if (inRange) nodes.push(node);
+      if (node === endNode) break;
+    }
+
+    // Wrap in reverse order to preserve offsets
+    for (var i = nodes.length - 1; i >= 0; i--) {
+      var n = nodes[i];
+      var range = document.createRange();
+      if (n === startNode) {
+        range.setStart(n, startIdx);
+        range.setEnd(n, n.textContent.length);
+      } else if (n === endNode) {
+        range.setStart(n, 0);
+        range.setEnd(n, endIdx);
+      } else {
+        range.selectNodeContents(n);
+      }
+      if (range.toString().length > 0) {
         var mark = document.createElement('mark');
-        mark.className = 'fc-hl' + (card.type === 'qa' ? ' fc-hl-qa' : '');
+        mark.className = hlClass;
         range.surroundContents(mark);
-        return;
       }
     }
   }
