@@ -2930,18 +2930,19 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     for (var i = 0; i < n; i++) {
       var el = document.getElementById(entries[i].dataset.target);
       if (!el) continue;
-      var rect = el.getBoundingClientRect();
-      var paraTop = rect.top;
-      var paraBottom = rect.bottom;
-      // Region bottom = this paragraph's own bottom (entry must stay within its paragraph)
-      var regionBottom = paraBottom;
-      // Clamp: stick at TOP_PAD, but pushed off when paragraph bottom approaches
+      var paraTop = el.getBoundingClientRect().top;
+      // Region = full territory: previous paragraph's bottom to next paragraph's top
+      var prevEl = i > 0 ? document.getElementById(entries[i - 1].dataset.target) : null;
+      var nextEl = i + 1 < n ? document.getElementById(entries[i + 1].dataset.target) : null;
+      var regionTop = prevEl ? prevEl.getBoundingClientRect().bottom : paraTop;
+      var regionBottom = nextEl ? nextEl.getBoundingClientRect().top : el.getBoundingClientRect().bottom;
+      // Clamp: stick at TOP_PAD, but pushed off when next paragraph approaches
       var pos = Math.min(regionBottom - ENTRY_H, Math.max(TOP_PAD, paraTop));
       entries[i].style.top = pos + 'px';
       // Fade when entry has slid above header
       entries[i].style.opacity = pos < TOP_PAD - 4 ? '0' : pos < TOP_PAD + 2 ? '0.4' : '1';
       // Update debug guides
-      guides[i].top.style.top = paraTop + 'px';
+      guides[i].top.style.top = regionTop + 'px';
       guides[i].bot.style.top = regionBottom + 'px';
     }
   }
