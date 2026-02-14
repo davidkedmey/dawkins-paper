@@ -323,12 +323,21 @@
     border-radius: 4px;
     border: 1px solid var(--border);
     cursor: pointer;
-    transition: border-color 0.15s;
-    width: 100%;
+    transition: border-color 0.15s, transform 0.15s;
+    width: 100% !important;
+    height: auto !important;
     aspect-ratio: 1;
   }
   .widget-offspring-grid canvas:hover {
     border-color: var(--accent);
+  }
+  @keyframes widget-select-flash {
+    0% { transform: scale(1); border-color: var(--accent); box-shadow: 0 0 0 0 rgba(88,166,255,0.5); }
+    40% { transform: scale(1.06); border-color: var(--accent); box-shadow: 0 0 12px 2px rgba(88,166,255,0.4); }
+    100% { transform: scale(1); border-color: var(--border); box-shadow: none; }
+  }
+  .widget-offspring-grid canvas.selected-flash {
+    animation: widget-select-flash 0.35s ease-out;
   }
 
   /* Gene Explorer */
@@ -993,8 +1002,8 @@ function paperDrawBiomorph(genes, cfg) {
 
 function paperRenderLines(canvas, lines, opts) {
   const ctx = canvas.getContext('2d');
-  const w = canvas.width;
-  const h = canvas.height;
+  const w = parseInt(canvas.style.width) || canvas.width;
+  const h = parseInt(canvas.style.height) || canvas.height;
   ctx.clearRect(0, 0, w, h);
   if (!lines || lines.length === 0) return;
 
@@ -1635,6 +1644,17 @@ function renderFigure15(container) {
 
 // ── Interactive Widgets ──────────────────────────────────────────
 
+function makeHiDPICanvas(cssW, cssH) {
+  const dpr = window.devicePixelRatio || 1;
+  const c = document.createElement('canvas');
+  c.width = cssW * dpr;
+  c.height = cssH * dpr;
+  c.style.width = cssW + 'px';
+  c.style.height = cssH + 'px';
+  c.getContext('2d').scale(dpr, dpr);
+  return c;
+}
+
 const GENE_TOOLTIPS = [
   'g1: Horizontal spread of inner branches',
   'g2: Horizontal spread of mid branches',
@@ -1672,9 +1692,7 @@ function createGeneExplorer(config) {
   const body = document.createElement('div');
   body.className = 'gene-explorer-body';
 
-  const canvas = document.createElement('canvas');
-  canvas.width = 200;
-  canvas.height = 200;
+  const canvas = makeHiDPICanvas(200, 200);
   body.appendChild(canvas);
 
   const slidersDiv = document.createElement('div');
@@ -1788,9 +1806,29 @@ function createBreedingWidget(config) {
     parentGenes = config.startGenes.slice();
     generation = 0;
     genCounter.textContent = 'Generation: 0';
+    nudge.style.opacity = '0';
+    nudge.style.height = '0';
+    nudge.style.marginBottom = '0';
     renderWidget();
   });
   controls.appendChild(startOverBtn);
+
+  // "Open in Full App" link
+  const SYM_MAP = { 'left-right': 'lr', 'up-down': 'ud', 'four-way': 'fw', 'asymmetric': 'as' };
+  const appLink = document.createElement('a');
+  appLink.textContent = 'Open in Full App \u2197';
+  appLink.target = '_blank';
+  appLink.style.cssText = 'font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:0.7rem;color:var(--text-dim);text-decoration:none;margin-left:auto;';
+  appLink.addEventListener('mouseenter', () => { appLink.style.color = 'var(--accent)'; });
+  appLink.addEventListener('mouseleave', () => { appLink.style.color = 'var(--text-dim)'; });
+  controls.appendChild(appLink);
+
+  function updateAppLink() {
+    let hash = '#m=' + mode + '&g=' + parentGenes.join(',') + '&s=' + (SYM_MAP[symmetry] || 'lr');
+    if (altAsym) hash += '&aa=1';
+    if (radial) hash += '&rs=1';
+    appLink.href = 'https://biomorphbuilder.com/' + hash;
+  }
 
   // Optional symmetry dropdown
   let symSelect = null;
@@ -1849,15 +1887,36 @@ function createBreedingWidget(config) {
 
   box.appendChild(controls);
 
+  // Encouragement nudge
+  const nudge = document.createElement('div');
+  nudge.style.cssText = 'font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:0.75rem;color:var(--accent);opacity:0;transition:opacity 0.4s;height:0;overflow:hidden;';
+  box.appendChild(nudge);
+
+  const NUDGES = [
+    [5, 'Nice start! The forms are diverging from your ancestor.'],
+    [15, 'You\'re getting somewhere \u2014 keep selecting toward your goal.'],
+    [30, 'Generation 30! Dawkins spent hours at this. You\'re a natural.'],
+    [50, 'Fifty generations deep. Look how far you\'ve come from the original.'],
+  ];
+  function updateNudge() {
+    for (let n = NUDGES.length - 1; n >= 0; n--) {
+      if (generation === NUDGES[n][0]) {
+        nudge.textContent = NUDGES[n][1];
+        nudge.style.height = 'auto';
+        nudge.style.marginBottom = '8px';
+        nudge.style.opacity = '1';
+        return;
+      }
+    }
+  }
+
   // Grid: parent + offspring
   const grid = document.createElement('div');
   grid.className = 'widget-grid';
 
   const parentCard = document.createElement('div');
   parentCard.className = 'widget-parent-card';
-  const parentCanvas = document.createElement('canvas');
-  parentCanvas.width = 160;
-  parentCanvas.height = 160;
+  const parentCanvas = makeHiDPICanvas(160, 160);
   parentCard.appendChild(parentCanvas);
   const parentLabel = document.createElement('div');
   parentLabel.className = 'parent-label';
@@ -1871,9 +1930,7 @@ function createBreedingWidget(config) {
   const offspringCanvases = [];
   const offspringGenes = [];
   for (let i = 0; i < 8; i++) {
-    const c = document.createElement('canvas');
-    c.width = 100;
-    c.height = 100;
+    const c = makeHiDPICanvas(120, 120);
     offspringCanvases.push(c);
     offspringGenes.push(null);
     offspringGrid.appendChild(c);
@@ -1887,13 +1944,16 @@ function createBreedingWidget(config) {
   }
 
   function renderWidget() {
+    updateAppLink();
     // Render parent
     const pLines = paperDrawBiomorph(parentGenes, getCfg());
     paperRenderLines(parentCanvas, pLines);
 
     // Generate + render offspring
     for (let i = 0; i < 8; i++) {
-      const child = paperMutate(parentGenes, mode);
+      let child = parentGenes.slice();
+      const mutations = 2 + Math.floor(Math.random() * 2); // 2-3 mutations
+      for (let m = 0; m < mutations; m++) child = paperMutate(child, mode);
       offspringGenes[i] = child;
       const cLines = paperDrawBiomorph(child, getCfg());
       paperRenderLines(offspringCanvases[i], cLines);
@@ -1902,10 +1962,15 @@ function createBreedingWidget(config) {
     // Attach click handlers (re-attach each render to keep closure fresh)
     for (let i = 0; i < 8; i++) {
       offspringCanvases[i].onclick = () => {
+        const c = offspringCanvases[i];
+        c.classList.remove('selected-flash');
+        void c.offsetWidth; // reflow to restart animation
+        c.classList.add('selected-flash');
         parentGenes = offspringGenes[i].slice();
         generation++;
         genCounter.textContent = 'Generation: ' + generation;
-        renderWidget();
+        updateNudge();
+        setTimeout(() => renderWidget(), 180);
       };
     }
   }
