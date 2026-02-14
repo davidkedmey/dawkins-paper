@@ -580,16 +580,26 @@
   }
   .pi-bracket {
     position: absolute;
-    right: -4px;
-    width: 8px;
-    border-right: 1px solid rgba(255, 255, 255, 0.13);
-    border-top: 1px solid rgba(255, 255, 255, 0.13);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.13);
-    border-radius: 0 3px 3px 0;
+    left: 184px;
+    width: 10px;
+    border-left: 1px solid rgba(255, 255, 255, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 3px 0 0 3px;
     pointer-events: none;
     display: none;
   }
-  .pi-expanded ~ .pi-bracket { display: block; }
+  .pi-connector {
+    position: absolute;
+    left: 155px;
+    width: 29px;
+    height: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    pointer-events: none;
+    display: none;
+  }
+  .pi-expanded ~ .pi-bracket,
+  .pi-expanded ~ .pi-connector { display: block; }
   .pi-entry.pi-heading {
     font-size: 0.65rem;
     font-weight: 700;
@@ -2980,15 +2990,20 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     guides.push({ top: gt, bot: gb });
   });
 
-  // Paragraph brackets (in #para-index, not .pi-inner, to avoid overflow clip)
+  // Paragraph brackets + connectors (in #para-index to avoid overflow clip)
   var nav = document.getElementById('para-index');
   var brackets = [];
+  var connectors = [];
   PARA_INDEX.forEach(function(item) {
-    if (item.heading) { brackets.push(null); return; }
+    if (item.heading) { brackets.push(null); connectors.push(null); return; }
     var b = document.createElement('div');
     b.className = 'pi-bracket';
     nav.appendChild(b);
     brackets.push(b);
+    var c = document.createElement('div');
+    c.className = 'pi-connector';
+    nav.appendChild(c);
+    connectors.push(c);
   });
 
 
@@ -2996,26 +3011,37 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     if (!expanded) return;
     var n = entries.length;
     var offset = inner.getBoundingClientRect().top;
+
+    // Batch all DOM reads first (avoid layout thrashing)
+    var rects = [];
     for (var i = 0; i < n; i++) {
       var el = document.getElementById(entries[i].dataset.target);
-      if (!el) continue;
-      var paraTop = el.getBoundingClientRect().top;
-      var paraBottom = el.getBoundingClientRect().bottom;
-      // Region = full territory (for debug guides only)
-      var prevEl = i > 0 ? document.getElementById(entries[i - 1].dataset.target) : null;
-      var nextEl = i + 1 < n ? document.getElementById(entries[i + 1].dataset.target) : null;
-      var regionTop = prevEl ? prevEl.getBoundingClientRect().bottom : paraTop;
-      var regionBottom = nextEl ? nextEl.getBoundingClientRect().top : paraBottom;
+      rects.push(el ? el.getBoundingClientRect() : null);
+    }
+
+    // Batch all DOM writes
+    for (var i = 0; i < n; i++) {
+      if (!rects[i]) continue;
+      var paraTop = rects[i].top;
+      var paraBottom = rects[i].bottom;
+      var prevRect = i > 0 ? rects[i - 1] : null;
+      var nextRect = i + 1 < n ? rects[i + 1] : null;
+      var regionTop = prevRect ? prevRect.bottom : paraTop;
+      var regionBottom = nextRect ? nextRect.top : paraBottom;
       // Clamp: stick at TOP_PAD, slide off with paragraph's own bottom
       var pos = Math.min(paraBottom - ENTRY_H, Math.max(TOP_PAD, paraTop));
       entries[i].style.top = (pos - offset) + 'px';
       // Update debug guides
       guides[i].top.style.top = (regionTop - offset) + 'px';
       guides[i].bot.style.top = (regionBottom - offset) + 'px';
-      // Update bracket (viewport coords, since brackets are in #para-index fixed at top:0)
+      // Update bracket (viewport coords — brackets are in fixed #para-index)
       if (brackets[i]) {
         brackets[i].style.top = paraTop + 'px';
         brackets[i].style.height = (paraBottom - paraTop) + 'px';
+      }
+      // Update connector: horizontal line at entry's vertical center
+      if (connectors[i]) {
+        connectors[i].style.top = (pos + ENTRY_H * 0.4) + 'px';
       }
     }
   }
