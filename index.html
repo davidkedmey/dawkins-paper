@@ -555,10 +555,10 @@
     border-color: var(--accent);
   }
 
-  .fc-qa-editor {
+  .fc-editor {
     position: absolute;
     z-index: 200;
-    width: 320px;
+    width: 360px;
     padding: 12px;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -567,17 +567,15 @@
     font-family: system-ui, sans-serif;
     display: none;
   }
-  .fc-qa-editor.fc-visible { display: block; }
-  .fc-qa-editor .fc-ctx {
-    font-size: 0.75rem;
+  .fc-editor.fc-visible { display: block; }
+  .fc-editor-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: var(--text-dim);
-    margin-bottom: 8px;
-    font-style: italic;
-    line-height: 1.4;
-    max-height: 3em;
-    overflow: hidden;
+    margin-bottom: 6px;
   }
-  .fc-qa-editor input, .fc-qa-editor textarea {
+  .fc-editor input, .fc-editor textarea {
     width: 100%;
     padding: 6px 8px;
     font-size: 0.85rem;
@@ -589,16 +587,16 @@
     margin-bottom: 6px;
     resize: vertical;
   }
-  .fc-qa-editor input:focus, .fc-qa-editor textarea:focus {
+  .fc-editor input:focus, .fc-editor textarea:focus {
     outline: none;
     border-color: var(--accent);
   }
-  .fc-qa-editor .fc-qa-btns {
+  .fc-editor-btns {
     display: flex;
     gap: 6px;
     justify-content: flex-end;
   }
-  .fc-qa-editor .fc-qa-btns button {
+  .fc-editor-btns button {
     padding: 4px 12px;
     font-size: 0.8rem;
     font-family: system-ui, sans-serif;
@@ -606,14 +604,40 @@
     cursor: pointer;
     border: 1px solid var(--border);
   }
-  .fc-qa-editor .fc-qa-btns .fc-save {
+  .fc-editor-btns .fc-save {
     background: var(--accent);
     color: var(--bg);
     border-color: var(--accent);
   }
-  .fc-qa-editor .fc-qa-btns .fc-cancel {
+  .fc-editor-btns .fc-cancel {
     background: var(--bg);
     color: var(--text);
+  }
+
+  .fc-words {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 8px;
+    user-select: none;
+  }
+  .fc-word {
+    cursor: pointer;
+    padding: 1px 0;
+    border-radius: 2px;
+    transition: background 0.1s, color 0.1s;
+  }
+  .fc-word:hover { background: rgba(88,166,255,0.15); }
+  .fc-word.fc-blanked {
+    background: var(--accent);
+    color: var(--bg);
+    border-radius: 3px;
+    padding: 1px 2px;
+  }
+  .fc-hint {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-bottom: 8px;
   }
 
   .fc-fab {
@@ -786,7 +810,7 @@
 
   @media (max-width: 600px) {
     .fc-drawer { width: 100vw; }
-    .fc-qa-editor { width: calc(100vw - 32px); }
+    .fc-editor { width: calc(100vw - 32px); }
     .fc-fab { width: 38px; height: 38px; font-size: 0.75rem; bottom: 16px; right: 16px; }
   }
 </style>
@@ -2585,7 +2609,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   'use strict';
 
   const STORAGE_KEY = 'fc_dawkins_evoevolvability';
-  const EXCLUDE = '.widget-box, .widget-graduation, figure, .fc-popup, .fc-drawer, .fc-qa-editor, .fc-fab, .fc-overlay';
+  const EXCLUDE = '.widget-box, .widget-graduation, figure, .fc-popup, .fc-drawer, .fc-editor, .fc-fab, .fc-overlay';
   let cards = [];
   let drawerOpen = false;
 
@@ -2608,15 +2632,19 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   popup.innerHTML = '<button data-fc="cloze">Cloze</button><button data-fc="qa">Q</button>';
   document.body.appendChild(popup);
 
-  // QA Editor
+  // Editor (shared for cloze + Q&A)
   const editor = document.createElement('div');
-  editor.className = 'fc-qa-editor';
+  editor.className = 'fc-editor';
   editor.innerHTML =
-    '<div class="fc-ctx"></div>' +
+    '<div class="fc-editor-label"></div>' +
+    '<div class="fc-words"></div>' +
+    '<div class="fc-hint"></div>' +
     '<input type="text" class="fc-q-input" placeholder="Question...">' +
     '<textarea class="fc-a-input" rows="2" placeholder="Answer (optional)"></textarea>' +
-    '<div class="fc-qa-btns"><button class="fc-cancel">Cancel</button><button class="fc-save">Save</button></div>';
+    '<div class="fc-editor-btns"><button class="fc-cancel">Cancel</button><button class="fc-save">Save</button></div>';
   document.body.appendChild(editor);
+
+  let editorMode = ''; // 'cloze' or 'qa'
 
   // FAB
   const fab = document.createElement('button');
@@ -2655,7 +2683,7 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
 
   // ── Selection detection ──
   document.addEventListener('mouseup', function(e) {
-    if (e.target.closest(EXCLUDE)) return;
+    if (e.target.closest && e.target.closest(EXCLUDE)) return;
 
     setTimeout(function() {
       const sel = window.getSelection();
@@ -2713,38 +2741,9 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
 
   // Hide popup on scroll or click outside
   document.addEventListener('mousedown', function(e) {
-    if (!e.target.closest('.fc-popup')) hidePopup();
-    if (!e.target.closest('.fc-qa-editor') && !e.target.closest('.fc-popup')) hideEditor();
+    if (!e.target.closest || !e.target.closest('.fc-popup')) hidePopup();
+    if (!e.target.closest || (!e.target.closest('.fc-editor') && !e.target.closest('.fc-popup'))) hideEditor();
   });
-
-  // ── Sentence extraction ──
-  function extractSentence(paraText, selected) {
-    const idx = paraText.indexOf(selected);
-    if (idx === -1) return { sentence: selected, front: '___' };
-
-    // Walk backward to sentence boundary
-    let start = idx;
-    while (start > 0) {
-      const ch = paraText[start - 1];
-      if ((ch === '.' || ch === '!' || ch === '?') && start < idx) {
-        // Check if followed by space or is the position
-        if (start < paraText.length && /\s/.test(paraText[start])) break;
-      }
-      start--;
-    }
-
-    // Walk forward to sentence boundary
-    let end = idx + selected.length;
-    while (end < paraText.length) {
-      const ch = paraText[end];
-      if (ch === '.' || ch === '!' || ch === '?') { end++; break; }
-      end++;
-    }
-
-    const sentence = paraText.slice(start, end).trim();
-    const front = sentence.replace(selected, '___');
-    return { sentence: sentence, front: front };
-  }
 
   // ── Flash FAB ──
   function flashFab() {
@@ -2753,77 +2752,163 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     fab.classList.add('fc-flash');
   }
 
+  // ── Editor positioning ──
+  function positionEditor() {
+    var rect = selRange.getBoundingClientRect();
+    var ew = 360;
+    var left = rect.left + window.scrollX;
+    var top = rect.bottom + 8 + window.scrollY;
+    left = Math.max(8, Math.min(left, window.innerWidth - ew - 8));
+    editor.style.left = left + 'px';
+    editor.style.top = top + 'px';
+  }
+
+  // ── Word tokenization for cloze ──
+  function tokenize(text) {
+    // Split into words and whitespace, preserving structure
+    return text.match(/\S+|\s+/g) || [];
+  }
+
+  function renderClozeWords(text) {
+    var wordsEl = editor.querySelector('.fc-words');
+    wordsEl.innerHTML = '';
+    var tokens = tokenize(text);
+    tokens.forEach(function(token, i) {
+      if (/^\s+$/.test(token)) {
+        wordsEl.appendChild(document.createTextNode(token));
+      } else {
+        var span = document.createElement('span');
+        span.className = 'fc-word';
+        span.textContent = token;
+        span.dataset.idx = i;
+        wordsEl.appendChild(span);
+      }
+    });
+  }
+
+  // ── Show editor in cloze or qa mode ──
+  function showEditor(mode) {
+    editorMode = mode;
+    var label = editor.querySelector('.fc-editor-label');
+    var wordsEl = editor.querySelector('.fc-words');
+    var hint = editor.querySelector('.fc-hint');
+    var qInput = editor.querySelector('.fc-q-input');
+    var aInput = editor.querySelector('.fc-a-input');
+
+    if (mode === 'cloze') {
+      label.textContent = 'Cloze';
+      renderClozeWords(selText);
+      wordsEl.style.display = '';
+      hint.style.display = '';
+      hint.textContent = 'Click words to blank them out';
+      qInput.style.display = 'none';
+      aInput.style.display = 'none';
+    } else {
+      label.textContent = 'Q & A';
+      wordsEl.style.display = 'none';
+      hint.style.display = 'none';
+      qInput.style.display = '';
+      qInput.value = '';
+      qInput.placeholder = 'Question...';
+      aInput.style.display = '';
+      aInput.value = '';
+      aInput.placeholder = 'Answer (optional — defaults to selection)';
+    }
+
+    positionEditor();
+    editor.classList.add('fc-visible');
+
+    if (mode === 'qa') {
+      setTimeout(function() { qInput.focus(); }, 50);
+    }
+  }
+
+  // ── Cloze word toggle ──
+  editor.querySelector('.fc-words').addEventListener('click', function(e) {
+    var word = e.target.closest('.fc-word');
+    if (word) word.classList.toggle('fc-blanked');
+  });
+
   // ── Popup button handlers ──
   popup.addEventListener('click', function(e) {
-    const btn = e.target.closest('button');
+    var btn = e.target.closest('button');
     if (!btn) return;
 
-    const action = btn.dataset.fc;
+    var action = btn.dataset.fc;
     hidePopup();
 
     if (action === 'cloze') {
-      const paraText = selParagraph.textContent;
-      const result = extractSentence(paraText, selText);
-      const card = {
+      showEditor('cloze');
+    }
+    if (action === 'qa') {
+      showEditor('qa');
+    }
+  });
+
+  // ── Editor save/cancel ──
+  editor.querySelector('.fc-save').addEventListener('click', function() {
+    if (editorMode === 'cloze') {
+      // Build front (with ___) and back (blanked words)
+      var blanked = editor.querySelectorAll('.fc-word.fc-blanked');
+      if (blanked.length === 0) return; // nothing selected
+
+      var tokens = editor.querySelectorAll('.fc-words')[0].childNodes;
+      var front = '';
+      var backs = [];
+      tokens.forEach(function(node) {
+        if (node.nodeType === 3) {
+          front += node.textContent;
+        } else if (node.classList && node.classList.contains('fc-word')) {
+          if (node.classList.contains('fc-blanked')) {
+            front += '___';
+            backs.push(node.textContent);
+          } else {
+            front += node.textContent;
+          }
+        }
+      });
+
+      var card = {
         id: 'c_' + Date.now(),
         type: 'cloze',
-        paragraphId: selParagraph.id,
+        paragraphId: selParagraph ? selParagraph.id : '',
         anchor: selText.slice(0, 50),
-        front: result.front,
-        back: selText,
+        front: front,
+        back: backs.join(', '),
         created: Date.now()
       };
       cards.push(card);
       save();
+      hideEditor();
+      flashFab();
+      window.getSelection().removeAllRanges();
+
+    } else {
+      // Q&A mode
+      var q = editor.querySelector('.fc-q-input').value.trim();
+      if (!q) { editor.querySelector('.fc-q-input').focus(); return; }
+      var a = editor.querySelector('.fc-a-input').value.trim();
+
+      var card = {
+        id: 'qa_' + Date.now(),
+        type: 'qa',
+        paragraphId: selParagraph ? selParagraph.id : '',
+        anchor: selText.slice(0, 50),
+        front: q,
+        back: a || selText,
+        created: Date.now()
+      };
+      cards.push(card);
+      save();
+      hideEditor();
       flashFab();
       window.getSelection().removeAllRanges();
     }
-
-    if (action === 'qa') {
-      // Show editor near selection
-      const rect = selRange.getBoundingClientRect();
-      let left = rect.left + window.scrollX;
-      let top = rect.bottom + 8 + window.scrollY;
-
-      // Clamp
-      const ew = 320;
-      left = Math.max(8, Math.min(left, window.innerWidth - ew - 8));
-
-      editor.style.left = left + 'px';
-      editor.style.top = top + 'px';
-      editor.querySelector('.fc-ctx').textContent = '"' + selText.slice(0, 80) + (selText.length > 80 ? '...' : '') + '"';
-      editor.querySelector('.fc-q-input').value = '';
-      editor.querySelector('.fc-a-input').value = '';
-      editor.classList.add('fc-visible');
-      setTimeout(function() { editor.querySelector('.fc-q-input').focus(); }, 50);
-    }
-  });
-
-  // ── QA Editor save/cancel ──
-  editor.querySelector('.fc-save').addEventListener('click', function() {
-    const q = editor.querySelector('.fc-q-input').value.trim();
-    if (!q) { editor.querySelector('.fc-q-input').focus(); return; }
-    const a = editor.querySelector('.fc-a-input').value.trim();
-
-    const card = {
-      id: 'qa_' + Date.now(),
-      type: 'qa',
-      paragraphId: selParagraph ? selParagraph.id : '',
-      anchor: selText.slice(0, 50),
-      front: q,
-      back: a || selText,
-      created: Date.now()
-    };
-    cards.push(card);
-    save();
-    hideEditor();
-    flashFab();
-    window.getSelection().removeAllRanges();
   });
 
   editor.querySelector('.fc-cancel').addEventListener('click', hideEditor);
 
-  // Save on Enter in question field
+  // Save on Enter in question field (Q&A mode only)
   editor.querySelector('.fc-q-input').addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -2923,10 +3008,13 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   }
 
   function exportMarkdown() {
-    let md = '';
+    var md = '';
     cards.forEach(function(c) {
       if (c.type === 'cloze') {
-        md += c.front.replace('___', '==' + c.back + '==') + '\n<!--SR:' + c.paragraphId + '-->\n\n';
+        var answers = c.back.split(', ');
+        var i = 0;
+        var line = c.front.replace(/___/g, function() { return '==' + (answers[i++] || '???') + '=='; });
+        md += line + '\n<!--SR:' + c.paragraphId + '-->\n\n';
       } else {
         md += c.front + '\n?\n' + c.back + '\n<!--SR:' + c.paragraphId + '-->\n\n';
       }
@@ -2935,10 +3023,18 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
   }
 
   function exportCSV() {
-    let csv = 'front\tback\ttags\n';
+    var csv = 'front\tback\ttags\n';
     cards.forEach(function(c) {
-      const front = c.type === 'cloze' ? c.front.replace('___', '{{c1::' + c.back + '}}') : c.front;
-      const back = c.type === 'cloze' ? '' : c.back;
+      var front, back;
+      if (c.type === 'cloze') {
+        var answers = c.back.split(', ');
+        var i = 0;
+        front = c.front.replace(/___/g, function() { return '{{c1::' + (answers[i++] || '???') + '}}'; });
+        back = '';
+      } else {
+        front = c.front;
+        back = c.back;
+      }
       csv += '"' + front.replace(/"/g, '""') + '"\t"' + back.replace(/"/g, '""') + '"\tdawkins::' + c.paragraphId + '\n';
     });
     downloadBlob(csv, 'dawkins-flashcards.txt', 'text/tab-separated-values');
