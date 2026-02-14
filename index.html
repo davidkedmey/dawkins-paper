@@ -995,25 +995,26 @@
   }
   .fc-study-popover .fc-study-front { margin-bottom: 8px; }
   .fc-study-popover .fc-study-back {
-    color: var(--text-dim);
+    color: var(--text);
     margin-bottom: 10px;
     padding-top: 8px;
     border-top: 1px dashed var(--border);
+    font-weight: 500;
   }
   .fc-reveal-btn {
     display: block;
     width: 100%;
-    padding: 8px 0;
-    font-size: 0.85rem;
+    padding: 6px 0;
+    font-size: 0.8rem;
     font-weight: 600;
-    border: none;
+    border: 1px solid var(--border);
     border-radius: 5px;
-    background: var(--accent);
-    color: var(--bg);
+    background: transparent;
+    color: var(--text-dim);
     cursor: pointer;
     margin-top: 4px;
   }
-  .fc-reveal-btn:hover { opacity: 0.85; }
+  .fc-reveal-btn:hover { border-color: var(--accent); color: var(--accent); }
   .fc-rate-btns {
     display: flex;
     gap: 6px;
@@ -1021,18 +1022,21 @@
   }
   .fc-rate-btns button {
     flex: 1;
-    padding: 7px 0;
-    font-size: 0.8rem;
-    font-weight: 700;
-    border: none;
+    padding: 5px 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid;
     border-radius: 5px;
     cursor: pointer;
-    color: #fff;
+    background: transparent;
   }
-  .fc-rate-btns button:hover { opacity: 0.85; }
-  .fc-rate-again { background: #f85149; }
-  .fc-rate-good { background: var(--accent); }
-  .fc-rate-easy { background: #3fb950; }
+  .fc-rate-btns button:hover { opacity: 0.8; }
+  .fc-rate-again { color: #f85149; border-color: #f8514940; }
+  .fc-rate-again:hover { background: #f8514915; }
+  .fc-rate-good { color: var(--accent); border-color: rgba(88,166,255,0.25); }
+  .fc-rate-good:hover { background: rgba(88,166,255,0.1); }
+  .fc-rate-easy { color: #3fb950; border-color: #3fb95040; }
+  .fc-rate-easy:hover { background: #3fb95015; }
   .fc-study-btn {
     display: block;
     width: 100%;
@@ -3834,6 +3838,8 @@ document.querySelectorAll('.fig-toggle-wrap').forEach(wrap => {
     var dot = document.querySelector('.fc-dot[data-card-id="' + next.id + '"]');
     if (dot) {
       dot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Auto-open popover after scroll settles
+      setTimeout(function() { showStudyPopover(dot, next); }, 600);
     }
   }
 
